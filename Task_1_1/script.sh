@@ -14,3 +14,4 @@ jar cfe app.jar ru.nsu.tokarev.Main -C build .
 
 # Запуск приложения из JAR-файла
 java -jar app.jar
+
