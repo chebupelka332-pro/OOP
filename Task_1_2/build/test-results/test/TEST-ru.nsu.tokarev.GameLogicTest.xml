@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="ru.nsu.tokarev.GameLogicTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2025-09-18T13:07:32" hostname="fedora" time="0.019">
+<testsuite name="ru.nsu.tokarev.GameLogicTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2025-09-18T15:45:14" hostname="fedora" time="0.01">
   <properties/>
-  <testcase name="Игрок получает блэкджек и выигрывает" classname="ru.nsu.tokarev.GameLogicTest" time="0.014"/>
-  <testcase name="Игрок берет карту и получает перебор" classname="ru.nsu.tokarev.GameLogicTest" time="0.003"/>
+  <testcase name="testPlayerGetsBlackjack()" classname="ru.nsu.tokarev.GameLogicTest" time="0.008"/>
+  <testcase name="testPlayerHitsAndBusts()" classname="ru.nsu.tokarev.GameLogicTest" time="0.002"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>
