@@ -159,13 +159,13 @@ public class Game {
      * Отображает текущее состояние карт на столе.
      *
      * @param revealDealerCard если {@code true}, показывает все карты дилера;
-     * если {@code false}, показывает только первую карту дилера.
+     *  если {@code false}, показывает только первую карту дилера.
      */
     private void showHands(boolean revealDealerCard) {
         System.out.println("Ваши карты: " + player.getHand() + " => " + player.getHandValue());
         if (revealDealerCard) {
-            System.out.println("Карты дилера: " + dealer.getHand() +
-                    " => " + dealer.getHandValue());
+            System.out.println("Карты дилера: " + dealer.getHand()
+                    + " => " + dealer.getHandValue());
         } else {
             System.out.println("Карты дилера: " + dealer.getDealerFirstCard());
         }

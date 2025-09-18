@@ -22,7 +22,7 @@ public class Participant {
     }
 
     /**
-     * Гетер hand
+     * Гетер hand.
      *
      * @return возвращает hand.
      */
