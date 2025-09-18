@@ -13,6 +13,7 @@ public enum Suit {
 
     /**
      * Конструктор класса.
+     *
      * @param name - имя.
      */
     Suit(String name) {
@@ -20,6 +21,7 @@ public enum Suit {
     }
 
     /**
+     * Гетер для возврата масти.
      *
      * @return возвращает масть.
      */

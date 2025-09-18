@@ -22,6 +22,7 @@ public class Participant {
     }
 
     /**
+     * Гетер hand
      *
      * @return возвращает hand.
      */
@@ -30,6 +31,7 @@ public class Participant {
     }
 
     /**
+     * Подсчет суммы достоинств карт.
      *
      * @return возвращает сумму карт.
      */

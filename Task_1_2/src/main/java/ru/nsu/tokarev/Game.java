@@ -164,7 +164,8 @@ public class Game {
     private void showHands(boolean revealDealerCard) {
         System.out.println("Ваши карты: " + player.getHand() + " => " + player.getHandValue());
         if (revealDealerCard) {
-            System.out.println("Карты дилера: " + dealer.getHand() + " => " + dealer.getHandValue());
+            System.out.println("Карты дилера: " + dealer.getHand() +
+                    " => " + dealer.getHandValue());
         } else {
             System.out.println("Карты дилера: " + dealer.getDealerFirstCard());
         }
