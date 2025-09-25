@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"ru.nsu.tokarev"}];updateSearchResults();
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"ru.nsu.tokarev"},{"l":"ru.nsu.tokarev.game"},{"l":"ru.nsu.tokarev.localization"},{"l":"ru.nsu.tokarev.model"},{"l":"ru.nsu.tokarev.ui"}];updateSearchResults();

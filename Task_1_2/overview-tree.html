@@ -27,6 +27,7 @@ loadScripts(document, 'script');</script>
 <div class="top-nav" id="navbar-top">
 <div class="skip-nav"><a href="#skip-navbar-top" title="Skip navigation links">Skip navigation links</a></div>
 <ul id="navbar-top-firstrow" class="nav-list" title="Navigation">
+<li><a href="index.html">Overview</a></li>
 <li>Package</li>
 <li>Class</li>
 <li class="nav-bar-cell1-rev">Tree</li>
@@ -49,7 +50,11 @@ loadScripts(document, 'script');</script>
 <h1 class="title">Hierarchy For All Packages</h1>
 <span class="package-hierarchy-label">Package Hierarchies:</span>
 <ul class="horizontal">
-<li><a href="ru/nsu/tokarev/package-tree.html">ru.nsu.tokarev</a></li>
+<li><a href="ru/nsu/tokarev/package-tree.html">ru.nsu.tokarev</a>, </li>
+<li><a href="ru/nsu/tokarev/game/package-tree.html">ru.nsu.tokarev.game</a>, </li>
+<li><a href="ru/nsu/tokarev/localization/package-tree.html">ru.nsu.tokarev.localization</a>, </li>
+<li><a href="ru/nsu/tokarev/model/package-tree.html">ru.nsu.tokarev.model</a>, </li>
+<li><a href="ru/nsu/tokarev/ui/package-tree.html">ru.nsu.tokarev.ui</a></li>
 </ul>
 </div>
 <section class="hierarchy">
@@ -57,19 +62,23 @@ loadScripts(document, 'script');</script>
 <ul>
 <li class="circle">java.lang.<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" class="type-name-link external-link" title="class or interface in java.lang">Object</a>
 <ul>
-<li class="circle">ru.nsu.tokarev.<a href="ru/nsu/tokarev/Card.html" class="type-name-link" title="class in ru.nsu.tokarev">Card</a></li>
-<li class="circle">ru.nsu.tokarev.<a href="ru/nsu/tokarev/Deck.html" class="type-name-link" title="class in ru.nsu.tokarev">Deck</a></li>
-<li class="circle">ru.nsu.tokarev.<a href="ru/nsu/tokarev/Game.html" class="type-name-link" title="class in ru.nsu.tokarev">Game</a></li>
-<li class="circle">ru.nsu.tokarev.<a href="ru/nsu/tokarev/Hand.html" class="type-name-link" title="class in ru.nsu.tokarev">Hand</a></li>
+<li class="circle">ru.nsu.tokarev.model.<a href="ru/nsu/tokarev/model/Card.html" class="type-name-link" title="class in ru.nsu.tokarev.model">Card</a></li>
+<li class="circle">ru.nsu.tokarev.ui.<a href="ru/nsu/tokarev/ui/ConsoleGameUI.html" class="type-name-link" title="class in ru.nsu.tokarev.ui">ConsoleGameUI</a> (implements ru.nsu.tokarev.ui.<a href="ru/nsu/tokarev/ui/GameUI.html" title="interface in ru.nsu.tokarev.ui">GameUI</a>)</li>
+<li class="circle">ru.nsu.tokarev.model.<a href="ru/nsu/tokarev/model/Deck.html" class="type-name-link" title="class in ru.nsu.tokarev.model">Deck</a></li>
+<li class="circle">ru.nsu.tokarev.localization.<a href="ru/nsu/tokarev/localization/EnglishGameMessages.html" class="type-name-link" title="class in ru.nsu.tokarev.localization">EnglishGameMessages</a> (implements ru.nsu.tokarev.localization.<a href="ru/nsu/tokarev/localization/GameMessages.html" title="interface in ru.nsu.tokarev.localization">GameMessages</a>)</li>
+<li class="circle">ru.nsu.tokarev.game.<a href="ru/nsu/tokarev/game/Game.html" class="type-name-link" title="class in ru.nsu.tokarev.game">Game</a></li>
+<li class="circle">ru.nsu.tokarev.model.<a href="ru/nsu/tokarev/model/Hand.html" class="type-name-link" title="class in ru.nsu.tokarev.model">Hand</a></li>
 <li class="circle">ru.nsu.tokarev.<a href="ru/nsu/tokarev/Main.html" class="type-name-link" title="class in ru.nsu.tokarev">Main</a></li>
-<li class="circle">ru.nsu.tokarev.<a href="ru/nsu/tokarev/Participant.html" class="type-name-link" title="class in ru.nsu.tokarev">Participant</a>
+<li class="circle">ru.nsu.tokarev.model.<a href="ru/nsu/tokarev/model/Participant.html" class="type-name-link" title="class in ru.nsu.tokarev.model">Participant</a></li>
+</ul>
+</li>
+</ul>
+</section>
+<section class="hierarchy">
+<h2 title="Interface Hierarchy">Interface Hierarchy</h2>
 <ul>
-<li class="circle">ru.nsu.tokarev.<a href="ru/nsu/tokarev/Dealer.html" class="type-name-link" title="class in ru.nsu.tokarev">Dealer</a></li>
-<li class="circle">ru.nsu.tokarev.<a href="ru/nsu/tokarev/Player.html" class="type-name-link" title="class in ru.nsu.tokarev">Player</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="circle">ru.nsu.tokarev.localization.<a href="ru/nsu/tokarev/localization/GameMessages.html" class="type-name-link" title="interface in ru.nsu.tokarev.localization">GameMessages</a></li>
+<li class="circle">ru.nsu.tokarev.ui.<a href="ru/nsu/tokarev/ui/GameUI.html" class="type-name-link" title="interface in ru.nsu.tokarev.ui">GameUI</a></li>
 </ul>
 </section>
 <section class="hierarchy">
@@ -79,8 +88,8 @@ loadScripts(document, 'script');</script>
 <ul>
 <li class="circle">java.lang.<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Enum.html" class="type-name-link external-link" title="class or interface in java.lang">Enum</a>&lt;E&gt; (implements java.lang.<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Comparable.html" title="class or interface in java.lang" class="external-link">Comparable</a>&lt;T&gt;, java.lang.constant.<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/constant/Constable.html" title="class or interface in java.lang.constant" class="external-link">Constable</a>, java.io.<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a>)
 <ul>
-<li class="circle">ru.nsu.tokarev.<a href="ru/nsu/tokarev/Rank.html" class="type-name-link" title="enum class in ru.nsu.tokarev">Rank</a></li>
-<li class="circle">ru.nsu.tokarev.<a href="ru/nsu/tokarev/Suit.html" class="type-name-link" title="enum class in ru.nsu.tokarev">Suit</a></li>
+<li class="circle">ru.nsu.tokarev.model.<a href="ru/nsu/tokarev/model/Rank.html" class="type-name-link" title="enum class in ru.nsu.tokarev.model">Rank</a></li>
+<li class="circle">ru.nsu.tokarev.model.<a href="ru/nsu/tokarev/model/Suit.html" class="type-name-link" title="enum class in ru.nsu.tokarev.model">Suit</a></li>
 </ul>
 </li>
 </ul>
