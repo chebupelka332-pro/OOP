@@ -1,21 +1,16 @@
 package ru.nsu.tokarev.parser;
 
 import ru.nsu.tokarev.expressions.*;
-import java.util.regex.Pattern;
 
 
 public class ExpressionParser {
-    
-    private static final Pattern NUMBER_PATTERN = Pattern.compile("-?\\d+(\\.\\d+)?");
-    private static final Pattern VARIABLE_PATTERN = Pattern.compile("[a-zA-Z][a-zA-Z0-9]*");
-
     public static Expression parse(String input) {
         if (input == null || input.trim().isEmpty()) {
             throw new IllegalArgumentException("Input cannot be null or empty");
         }
         
         String trimmed = input.trim();
-        return parseExpression(trimmed, 0).expression;
+        return parseWithPrecedence(trimmed);
     }
 
     public static Expression parseWithoutParentheses(String input) {
@@ -36,7 +31,8 @@ public class ExpressionParser {
         if (ch == '(') {
             // Parse parenthesized expression
             return parseParenthesizedExpression(input, start);
-        } else if (Character.isDigit(ch) || (ch == '-' && start + 1 < input.length() && Character.isDigit(input.charAt(start + 1)))) {
+        } else if (Character.isDigit(ch) || (ch == '-' && start + 1 < input.length() &&
+                Character.isDigit(input.charAt(start + 1)))) {
             // Parse number
             return parseNumber(input, start);
         } else if (Character.isLetter(ch)) {
@@ -124,7 +120,20 @@ public class ExpressionParser {
     }
     
     private static Expression parseWithPrecedence(String input) {
-        return parseAddSub(input.replaceAll("\\s+", ""), new int[]{0});
+        int[] pos = new int[]{0};
+        Expression result = parseAddSub(input.replaceAll("\\s+", ""), pos);
+
+        // Validate that all input was consumed
+        if (pos[0] < input.replaceAll("\\s+", "").length()) {
+            char unexpectedChar = input.replaceAll("\\s+", "").charAt(pos[0]);
+            if (unexpectedChar == ')') {
+                throw new IllegalArgumentException("Unexpected closing parenthesis at position " + pos[0]);
+            } else {
+                throw new IllegalArgumentException("Unexpected character: " + unexpectedChar + " at position " + pos[0]);
+            }
+        }
+
+        return result;
     }
     
     private static Expression parseAddSub(String input, int[] pos) {

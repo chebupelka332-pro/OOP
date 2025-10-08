@@ -29,5 +29,11 @@ public class Main {
         ExpressionParser parser = new ExpressionParser();
         Expression e2 = parser.parse("3 + 2 * x");
         System.out.println(e2.print()); // (3+(2*x))
+
+        Expression e3 = parser.parse("(3 + (2 * x)) / (y - 4)");
+        System.out.println(e3.print()); // ((3+(2*x))/(y-4))
+
+        double result1 = e3.eval("x=9;y=7");
+        System.out.println(result1);
     }
 }
