@@ -91,32 +91,32 @@ class ExpressionParserTest {
 
     @Test
     void testParseWithoutParentheses() {
-        Expression expr = ExpressionParser.parseWithoutParentheses("3 + 2 * x");
+        Expression expr = ExpressionParser.parse("3 + 2 * x");
         assertEquals(23.0, expr.eval("x = 10"));
         assertEquals("(3+(2*x))", expr.print());
     }
 
     @Test
     void testParseWithoutParenthesesPrecedence() {
-        Expression expr1 = ExpressionParser.parseWithoutParentheses("2 + 3 * 4");
+        Expression expr1 = ExpressionParser.parse("2 + 3 * 4");
         assertEquals(14.0, expr1.eval(""));
 
-        Expression expr2 = ExpressionParser.parseWithoutParentheses("12 / 3 + 2");
+        Expression expr2 = ExpressionParser.parse("12 / 3 + 2");
         assertEquals(6.0, expr2.eval(""));
 
-        Expression expr3 = ExpressionParser.parseWithoutParentheses("10 - 3 - 2");
+        Expression expr3 = ExpressionParser.parse("10 - 3 - 2");
         assertEquals(5.0, expr3.eval(""));
     }
 
     @Test
     void testParseWithoutParenthesesWithParens() {
-        Expression expr = ExpressionParser.parseWithoutParentheses("(2 + 3) * 4");
+        Expression expr = ExpressionParser.parse("(2 + 3) * 4");
         assertEquals(20.0, expr.eval(""));
     }
 
     @Test
     void testParseWithoutParenthesesComplex() {
-        Expression expr = ExpressionParser.parseWithoutParentheses("x * y + z / 2");
+        Expression expr = ExpressionParser.parse("x * y + z / 2");
         assertEquals(23.0, expr.eval("x = 5; y = 4; z = 6"));
         assertEquals("((x*y)+(z/2))", expr.print());
     }
@@ -147,10 +147,10 @@ class ExpressionParserTest {
 
     @Test
     void testParseWithoutParenthesesErrors() {
-        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parseWithoutParentheses(null));
-        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parseWithoutParentheses(""));
-        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parseWithoutParentheses("3 +"));
-        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parseWithoutParentheses("(3 + 5"));
+        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse(null));
+        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse(""));
+        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("3 +"));
+        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("(3 + 5"));
     }
 
     @Test
@@ -158,13 +158,118 @@ class ExpressionParserTest {
         Expression expr1 = ExpressionParser.parse("(-3+5)");
         assertEquals(2.0, expr1.eval(""));
 
-        Expression expr2 = ExpressionParser.parseWithoutParentheses("-3 + 5");
+        Expression expr2 = ExpressionParser.parse("-3 + 5");
         assertEquals(2.0, expr2.eval(""));
     }
 
     @Test
     void testParseWhitespace() {
-        Expression expr = ExpressionParser.parseWithoutParentheses("  3  +  2  *  x  ");
+        Expression expr = ExpressionParser.parse("  3  +  2  *  x  ");
         assertEquals(23.0, expr.eval("x = 10"));
+    }
+
+    @Test
+    void testParseDecimalNumbers() {
+        Expression expr1 = ExpressionParser.parse("3.5 + 2.7");
+        assertEquals(6.2, expr1.eval(""), 0.001);
+
+        Expression expr2 = ExpressionParser.parse("(3.14*2.0)");
+        assertEquals(6.28, expr2.eval(""), 0.001);
+
+        Expression expr3 = ExpressionParser.parse("-3.5 + 2");
+        assertEquals(-1.5, expr3.eval(""), 0.001);
+    }
+
+    @Test
+    void testParseInvalidNumbers() {
+        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("3..5"));
+        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("3.5.2"));
+    }
+
+    @Test
+    void testParseComplexWhitespaceHandling() {
+        Expression expr1 = ExpressionParser.parse("   (3+5)   ");
+        assertEquals(8.0, expr1.eval(""));
+
+        Expression expr2 = ExpressionParser.parse("   x + y   ");
+        assertEquals(7.0, expr2.eval("x = 3; y = 4"));
+    }
+
+    @Test
+    void testParseUnexpectedCharacterErrors() {
+        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("3 @ 5"));
+        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("x # y"));
+        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("3 $ 5"));
+        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("(3@5)"));
+    }
+
+    @Test
+    void testParseEmptyParenthesesInWithoutParentheses() {
+        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("()"));
+        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("3 + ()"));
+    }
+
+    @Test
+    void testParseMultipleConsecutiveOperators() {
+        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("3 ++ 5"));
+        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("3 +* 5"));
+        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("3 */ 5"));
+    }
+
+    @Test
+    void testParseOperatorAtEnd() {
+        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("3 * 5 +"));
+        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("x -"));
+        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("3 /"));
+    }
+
+    @Test
+    void testParseVariableNames() {
+        Expression expr1 = ExpressionParser.parse("var123 + x1");
+        assertEquals(15.0, expr1.eval("var123 = 10; x1 = 5"));
+
+        Expression expr2 = ExpressionParser.parse("(abc+def)");
+        assertEquals(9.0, expr2.eval("abc = 4; def = 5"));
+    }
+
+    @Test
+    void testParseComplexNegativeNumbers() {
+        Expression expr1 = ExpressionParser.parse("-5 * -3");
+        assertEquals(15.0, expr1.eval(""));
+
+        Expression expr2 = ExpressionParser.parse("x + -2.5");
+        assertEquals(2.5, expr2.eval("x = 5"));
+    }
+
+    @Test
+    void testParseUnmatchedParentheses() {
+        // Test various unmatched parentheses scenarios
+        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("((3 + 5)"));
+        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("(3 + 5))"));
+        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse(")(3 + 5)"));
+    }
+
+    @Test
+    void testParseLeftAssociativity() {
+        Expression expr1 = ExpressionParser.parse("10 - 3 - 2");
+        assertEquals(5.0, expr1.eval(""));
+
+        Expression expr2 = ExpressionParser.parse("12 / 3 / 2");
+        assertEquals(2.0, expr2.eval(""));
+    }
+
+    @Test
+    void testParseSingleCharacterExpressions() {
+        Expression num = ExpressionParser.parse("5");
+        assertEquals(5.0, num.eval(""));
+
+        Expression var = ExpressionParser.parse("x");
+        assertEquals(10.0, var.eval("x = 10"));
+    }
+
+    @Test
+    void testParseWhitespaceOnlyInput() {
+        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("   "));
+        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("   "));
     }
 }

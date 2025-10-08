@@ -13,117 +13,10 @@ public class ExpressionParser {
         return parseWithPrecedence(trimmed);
     }
 
-    public static Expression parseWithoutParentheses(String input) {
-        if (input == null || input.trim().isEmpty()) {
-            throw new IllegalArgumentException("Input cannot be null or empty");
-        }
-        
-        return parseWithPrecedence(input.trim());
-    }
-    
-    private static ParseResult parseExpression(String input, int start) {
-        if (start >= input.length()) {
-            throw new IllegalArgumentException("Unexpected end of input");
-        }
-        
-        char ch = input.charAt(start);
-        
-        if (ch == '(') {
-            // Parse parenthesized expression
-            return parseParenthesizedExpression(input, start);
-        } else if (Character.isDigit(ch) || (ch == '-' && start + 1 < input.length() &&
-                Character.isDigit(input.charAt(start + 1)))) {
-            // Parse number
-            return parseNumber(input, start);
-        } else if (Character.isLetter(ch)) {
-            // Parse variable
-            return parseVariable(input, start);
-        } else {
-            throw new IllegalArgumentException("Unexpected character: " + ch);
-        }
-    }
-    
-    private static ParseResult parseParenthesizedExpression(String input, int start) {
-        if (input.charAt(start) != '(') {
-            throw new IllegalArgumentException("Expected '(' at position " + start);
-        }
-        
-        int pos = start + 1;
-        ParseResult leftResult = parseExpression(input, pos);
-        pos = leftResult.nextPosition;
-        
-        if (pos >= input.length()) {
-            throw new IllegalArgumentException("Unexpected end of input, expected operator");
-        }
-        
-        char operator = input.charAt(pos);
-        pos++;
-        
-        ParseResult rightResult = parseExpression(input, pos);
-        pos = rightResult.nextPosition;
-        
-        if (pos >= input.length() || input.charAt(pos) != ')') {
-            throw new IllegalArgumentException("Expected ')' at position " + pos);
-        }
-        
-        Expression result = createBinaryOperation(operator, leftResult.expression, rightResult.expression);
-        return new ParseResult(result, pos + 1);
-    }
-    
-    private static ParseResult parseNumber(String input, int start) {
-        StringBuilder sb = new StringBuilder();
-        int pos = start;
-        
-        if (pos < input.length() && input.charAt(pos) == '-') {
-            sb.append('-');
-            pos++;
-        }
-        
-        while (pos < input.length() && (Character.isDigit(input.charAt(pos)) || input.charAt(pos) == '.')) {
-            sb.append(input.charAt(pos));
-            pos++;
-        }
-        
-        try {
-            double value = Double.parseDouble(sb.toString());
-            return new ParseResult(new ru.nsu.tokarev.expressions.Number(value), pos);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid number format: " + sb.toString());
-        }
-    }
-    
-    private static ParseResult parseVariable(String input, int start) {
-        StringBuilder sb = new StringBuilder();
-        int pos = start;
-        
-        while (pos < input.length() && (Character.isLetterOrDigit(input.charAt(pos)))) {
-            sb.append(input.charAt(pos));
-            pos++;
-        }
-        
-        return new ParseResult(new Variable(sb.toString()), pos);
-    }
-    
-    private static Expression createBinaryOperation(char operator, Expression left, Expression right) {
-        switch (operator) {
-            case '+':
-                return new Add(left, right);
-            case '-':
-                return new Sub(left, right);
-            case '*':
-                return new Mul(left, right);
-            case '/':
-                return new Div(left, right);
-            default:
-                throw new IllegalArgumentException("Unknown operator: " + operator);
-        }
-    }
-    
     private static Expression parseWithPrecedence(String input) {
         int[] pos = new int[]{0};
         Expression result = parseAddSub(input.replaceAll("\\s+", ""), pos);
-        
-        // Validate that all input was consumed
+
         if (pos[0] < input.replaceAll("\\s+", "").length()) {
             char unexpectedChar = input.replaceAll("\\s+", "").charAt(pos[0]);
             if (unexpectedChar == ')') {
@@ -224,15 +117,5 @@ public class ExpressionParser {
         }
         
         return new Variable(sb.toString());
-    }
-    
-    private static class ParseResult {
-        final Expression expression;
-        final int nextPosition;
-        
-        ParseResult(Expression expression, int nextPosition) {
-            this.expression = expression;
-            this.nextPosition = nextPosition;
-        }
     }
 }
