@@ -125,22 +125,22 @@ class ExpressionParserTest {
     void testParseErrors() {
         // Null input
         assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse(null));
-
+        
         // Empty input
         assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse(""));
-
+        
         // Missing closing parenthesis
         assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("(3+5"));
-
+        
         // Missing opening parenthesis
         assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("3+5)"));
-
+        
         // Invalid operator
         assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("(3%5)"));
-
+        
         // Unexpected end of input
         assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("(3+"));
-
+        
         // Empty parentheses
         assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("()"));
     }

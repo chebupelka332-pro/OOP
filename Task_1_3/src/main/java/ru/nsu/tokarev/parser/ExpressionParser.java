@@ -122,7 +122,7 @@ public class ExpressionParser {
     private static Expression parseWithPrecedence(String input) {
         int[] pos = new int[]{0};
         Expression result = parseAddSub(input.replaceAll("\\s+", ""), pos);
-
+        
         // Validate that all input was consumed
         if (pos[0] < input.replaceAll("\\s+", "").length()) {
             char unexpectedChar = input.replaceAll("\\s+", "").charAt(pos[0]);
@@ -132,7 +132,7 @@ public class ExpressionParser {
                 throw new IllegalArgumentException("Unexpected character: " + unexpectedChar + " at position " + pos[0]);
             }
         }
-
+        
         return result;
     }
     
