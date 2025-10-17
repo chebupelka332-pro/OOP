@@ -3,6 +3,7 @@ package ru.nsu.tokarev.parser;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import ru.nsu.tokarev.expressions.*;
+import ru.nsu.tokarev.exceptions.*;
 
 class ExpressionParserTest {
 
@@ -124,33 +125,33 @@ class ExpressionParserTest {
     @Test
     void testParseErrors() {
         // Null input
-        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse(null));
+        assertThrows(InvalidInputException.class, () -> ExpressionParser.parse(null));
         
         // Empty input
-        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse(""));
+        assertThrows(InvalidInputException.class, () -> ExpressionParser.parse(""));
         
         // Missing closing parenthesis
-        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("(3+5"));
+        assertThrows(ParseException.class, () -> ExpressionParser.parse("(3+5"));
         
         // Missing opening parenthesis
-        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("3+5)"));
+        assertThrows(ParseException.class, () -> ExpressionParser.parse("3+5)"));
         
         // Invalid operator
-        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("(3%5)"));
+        assertThrows(ParseException.class, () -> ExpressionParser.parse("(3%5)"));
         
         // Unexpected end of input
-        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("(3+"));
+        assertThrows(ParseException.class, () -> ExpressionParser.parse("(3+"));
         
         // Empty parentheses
-        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("()"));
+        assertThrows(ParseException.class, () -> ExpressionParser.parse("()"));
     }
 
     @Test
     void testParseWithoutParenthesesErrors() {
-        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse(null));
-        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse(""));
-        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("3 +"));
-        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("(3 + 5"));
+        assertThrows(InvalidInputException.class, () -> ExpressionParser.parse(null));
+        assertThrows(InvalidInputException.class, () -> ExpressionParser.parse(""));
+        assertThrows(ParseException.class, () -> ExpressionParser.parse("3 +"));
+        assertThrows(ParseException.class, () -> ExpressionParser.parse("(3 + 5"));
     }
 
     @Test
@@ -182,8 +183,8 @@ class ExpressionParserTest {
 
     @Test
     void testParseInvalidNumbers() {
-        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("3..5"));
-        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("3.5.2"));
+        assertThrows(ParseException.class, () -> ExpressionParser.parse("3..5"));
+        assertThrows(ParseException.class, () -> ExpressionParser.parse("3.5.2"));
     }
 
     @Test
@@ -197,30 +198,30 @@ class ExpressionParserTest {
 
     @Test
     void testParseUnexpectedCharacterErrors() {
-        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("3 @ 5"));
-        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("x # y"));
-        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("3 $ 5"));
-        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("(3@5)"));
+        assertThrows(ParseException.class, () -> ExpressionParser.parse("3 @ 5"));
+        assertThrows(ParseException.class, () -> ExpressionParser.parse("x # y"));
+        assertThrows(ParseException.class, () -> ExpressionParser.parse("3 $ 5"));
+        assertThrows(ParseException.class, () -> ExpressionParser.parse("(3@5)"));
     }
 
     @Test
     void testParseEmptyParenthesesInWithoutParentheses() {
-        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("()"));
-        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("3 + ()"));
+        assertThrows(ParseException.class, () -> ExpressionParser.parse("()"));
+        assertThrows(ParseException.class, () -> ExpressionParser.parse("3 + ()"));
     }
 
     @Test
     void testParseMultipleConsecutiveOperators() {
-        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("3 ++ 5"));
-        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("3 +* 5"));
-        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("3 */ 5"));
+        assertThrows(ParseException.class, () -> ExpressionParser.parse("3 ++ 5"));
+        assertThrows(ParseException.class, () -> ExpressionParser.parse("3 +* 5"));
+        assertThrows(ParseException.class, () -> ExpressionParser.parse("3 */ 5"));
     }
 
     @Test
     void testParseOperatorAtEnd() {
-        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("3 * 5 +"));
-        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("x -"));
-        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("3 /"));
+        assertThrows(ParseException.class, () -> ExpressionParser.parse("3 * 5 +"));
+        assertThrows(ParseException.class, () -> ExpressionParser.parse("x -"));
+        assertThrows(ParseException.class, () -> ExpressionParser.parse("3 /"));
     }
 
     @Test
@@ -244,9 +245,9 @@ class ExpressionParserTest {
     @Test
     void testParseUnmatchedParentheses() {
         // Test various unmatched parentheses scenarios
-        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("((3 + 5)"));
-        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("(3 + 5))"));
-        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse(")(3 + 5)"));
+        assertThrows(ParseException.class, () -> ExpressionParser.parse("((3 + 5)"));
+        assertThrows(ParseException.class, () -> ExpressionParser.parse("(3 + 5))"));
+        assertThrows(ParseException.class, () -> ExpressionParser.parse(")(3 + 5)"));
     }
 
     @Test
@@ -269,7 +270,7 @@ class ExpressionParserTest {
 
     @Test
     void testParseWhitespaceOnlyInput() {
-        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("   "));
-        assertThrows(IllegalArgumentException.class, () -> ExpressionParser.parse("   "));
+        assertThrows(InvalidInputException.class, () -> ExpressionParser.parse("   "));
+        assertThrows(InvalidInputException.class, () -> ExpressionParser.parse("   "));
     }
 }

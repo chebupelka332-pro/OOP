@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.Map;
 import java.util.HashMap;
+import ru.nsu.tokarev.exceptions.*;
 
 class VariableTest {
 
@@ -21,9 +22,9 @@ class VariableTest {
 
     @Test
     void testConstructor() {
-        assertThrows(IllegalArgumentException.class, () -> new Variable(null));
-        assertThrows(IllegalArgumentException.class, () -> new Variable(""));
-        assertThrows(IllegalArgumentException.class, () -> new Variable("   "));
+        assertThrows(InvalidInputException.class, () -> new Variable(null));
+        assertThrows(InvalidInputException.class, () -> new Variable(""));
+        assertThrows(InvalidInputException.class, () -> new Variable("   "));
 
         Variable trimmed = new Variable("  x  ");
         assertEquals("x", trimmed.getName());
@@ -46,7 +47,7 @@ class VariableTest {
         Map<String, Double> variables = new HashMap<>();
         variables.put("y", 5.0);
 
-        assertThrows(IllegalArgumentException.class, () -> x.eval(variables));
+        assertThrows(VariableNotDefinedException.class, () -> x.eval(variables));
     }
 
     @Test
@@ -58,7 +59,7 @@ class VariableTest {
         // Multiple variables
         assertEquals(10.0, x.eval("x = 10; y = 5"));
 
-        assertThrows(IllegalArgumentException.class, () -> x.eval("y = 10"));
+        assertThrows(VariableNotDefinedException.class, () -> x.eval("y = 10"));
     }
 
     @Test

@@ -2,6 +2,7 @@ package ru.nsu.tokarev.expressions;
 
 import java.util.Map;
 import java.util.Objects;
+import ru.nsu.tokarev.exceptions.InvalidInputException;
 
 
 public abstract class BinaryOperation extends Expression {
@@ -10,7 +11,7 @@ public abstract class BinaryOperation extends Expression {
 
     public BinaryOperation(Expression left, Expression right) {
         if (left == null || right == null) {
-            throw new IllegalArgumentException("Operands cannot be null");
+            throw new InvalidInputException("Operands cannot be null");
         }
         this.left = left;
         this.right = right;
@@ -41,6 +42,4 @@ public abstract class BinaryOperation extends Expression {
     public Expression getRight() {
         return right;
     }
-
-    protected abstract String getOperator();
 }

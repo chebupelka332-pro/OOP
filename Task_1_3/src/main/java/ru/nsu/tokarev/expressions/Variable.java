@@ -2,6 +2,8 @@ package ru.nsu.tokarev.expressions;
 
 import java.util.Map;
 import java.util.Objects;
+import ru.nsu.tokarev.exceptions.InvalidInputException;
+import ru.nsu.tokarev.exceptions.VariableNotDefinedException;
 
 
 public class Variable extends Expression {
@@ -9,7 +11,7 @@ public class Variable extends Expression {
 
     public Variable(String name) {
         if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("Variable name cannot be null or empty");
+            throw new InvalidInputException("Variable name cannot be null or empty");
         }
         this.name = name.trim();
     }
@@ -17,7 +19,7 @@ public class Variable extends Expression {
     @Override
     public double eval(Map<String, Double> variables) {
         if (!variables.containsKey(name)) {
-            throw new IllegalArgumentException("Variable '" + name + "' is not defined");
+            throw new VariableNotDefinedException(name);
         }
         return variables.get(name);
     }

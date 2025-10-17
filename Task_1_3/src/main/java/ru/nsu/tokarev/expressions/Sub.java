@@ -48,8 +48,7 @@ public class Sub extends BinaryOperation {
         return new Sub(leftSimp, rightSimp);
     }
 
-    @Override
-    protected String getOperator() {
-        return "-";
+    public static char getOperator() {
+        return '-';
     }
 }

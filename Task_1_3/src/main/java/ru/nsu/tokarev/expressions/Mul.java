@@ -58,8 +58,7 @@ public class Mul extends BinaryOperation {
         return new Mul(leftSimp, rightSimp);
     }
 
-    @Override
-    protected String getOperator() {
-        return "*";
+    public static char getOperator() {
+        return '*';
     }
 }

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.Map;
 import java.util.HashMap;
+import ru.nsu.tokarev.exceptions.*;
 
 class SubTest {
     
@@ -34,8 +35,8 @@ class SubTest {
     
     @Test
     void testConstructor() {
-        assertThrows(IllegalArgumentException.class, () -> new Sub(null, three));
-        assertThrows(IllegalArgumentException.class, () -> new Sub(three, null));
+        assertThrows(InvalidInputException.class, () -> new Sub(null, three));
+        assertThrows(InvalidInputException.class, () -> new Sub(three, null));
     }
     
     @Test
@@ -93,6 +94,6 @@ class SubTest {
     
     @Test
     void testGetOperator() {
-        assertEquals("-", simpleSub.getOperator());
+        assertEquals('-', Sub.getOperator());
     }
 }

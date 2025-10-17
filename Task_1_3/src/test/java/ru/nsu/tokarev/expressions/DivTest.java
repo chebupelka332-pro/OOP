@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.Map;
 import java.util.HashMap;
+import ru.nsu.tokarev.exceptions.*;
 
 class DivTest {
     
@@ -38,8 +39,8 @@ class DivTest {
     
     @Test
     void testConstructor() {
-        assertThrows(IllegalArgumentException.class, () -> new Div(null, three));
-        assertThrows(IllegalArgumentException.class, () -> new Div(three, null));
+        assertThrows(InvalidInputException.class, () -> new Div(null, three));
+        assertThrows(InvalidInputException.class, () -> new Div(three, null));
     }
     
     @Test
@@ -62,7 +63,7 @@ class DivTest {
         variables.put("y", 0.0);
         
         Div divByZero = new Div(x, y);
-        assertThrows(ArithmeticException.class, () -> divByZero.eval(variables));
+        assertThrows(DivisionByZeroException.class, () -> divByZero.eval(variables));
     }
     
     @Test
@@ -110,7 +111,7 @@ class DivTest {
     @Test
     void testSimplifyDivisionByZero() {
         Div divByZero = new Div(one, zero);
-        assertThrows(ArithmeticException.class, () -> divByZero.simplify());
+        assertThrows(DivisionByZeroException.class, () -> divByZero.simplify());
     }
     
     @Test
@@ -122,6 +123,6 @@ class DivTest {
     
     @Test
     void testGetOperator() {
-        assertEquals("/", simpleDiv.getOperator());
+        assertEquals('/', Div.getOperator());
     }
 }

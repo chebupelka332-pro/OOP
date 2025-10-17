@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.Map;
 import java.util.HashMap;
+import ru.nsu.tokarev.exceptions.*;
 
 class MulTest {
     
@@ -36,8 +37,8 @@ class MulTest {
     
     @Test
     void testConstructor() {
-        assertThrows(IllegalArgumentException.class, () -> new Mul(null, three));
-        assertThrows(IllegalArgumentException.class, () -> new Mul(three, null));
+        assertThrows(InvalidInputException.class, () -> new Mul(null, three));
+        assertThrows(InvalidInputException.class, () -> new Mul(three, null));
     }
     
     @Test
@@ -114,6 +115,6 @@ class MulTest {
     
     @Test
     void testGetOperator() {
-        assertEquals("*", simpleMul.getOperator());
+        assertEquals('*', Mul.getOperator());
     }
 }

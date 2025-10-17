@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.Map;
 import java.util.HashMap;
+import ru.nsu.tokarev.exceptions.*;
 
 class AddTest {
     
@@ -32,9 +33,9 @@ class AddTest {
     
     @Test
     void testConstructor() {
-        assertThrows(IllegalArgumentException.class, () -> new Add(null, three));
-        assertThrows(IllegalArgumentException.class, () -> new Add(three, null));
-        assertThrows(IllegalArgumentException.class, () -> new Add(null, null));
+        assertThrows(InvalidInputException.class, () -> new Add(null, three));
+        assertThrows(InvalidInputException.class, () -> new Add(three, null));
+        assertThrows(InvalidInputException.class, () -> new Add(null, null));
     }
     
     @Test
@@ -128,7 +129,7 @@ class AddTest {
     
     @Test
     void testGetOperator() {
-        assertEquals("+", simpleAdd.getOperator());
+        assertEquals('+', Add.getOperator());
     }
     
     @Test

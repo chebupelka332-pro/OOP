@@ -48,8 +48,7 @@ public class Add extends BinaryOperation {
         return new Add(leftSimp, rightSimp);
     }
 
-    @Override
-    protected String getOperator() {
-        return "+";
+    public static char getOperator() {
+        return '+';
     }
 }

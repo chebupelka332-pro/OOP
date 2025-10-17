@@ -1,6 +1,7 @@
 package ru.nsu.tokarev.expressions;
 
 import java.util.Map;
+import ru.nsu.tokarev.exceptions.DivisionByZeroException;
 
 
 public class Div extends BinaryOperation {
@@ -13,7 +14,7 @@ public class Div extends BinaryOperation {
     public double eval(Map<String, Double> variables) {
         double rightValue = right.eval(variables);
         if (rightValue == 0) {
-            throw new ArithmeticException("Division by zero");
+            throw new DivisionByZeroException();
         }
         return left.eval(variables) / rightValue;
     }
@@ -44,7 +45,7 @@ public class Div extends BinaryOperation {
         if (!leftSimp.hasVariables() && !rightSimp.hasVariables()) {
             double rightValue = rightSimp.eval(Map.of());
             if (rightValue == 0) {
-                throw new ArithmeticException("Division by zero in simplification");
+                throw new DivisionByZeroException("Division by zero in simplification");
             }
             double result = leftSimp.eval(Map.of()) / rightValue;
             return new Number(result);
@@ -68,8 +69,7 @@ public class Div extends BinaryOperation {
         return new Div(leftSimp, rightSimp);
     }
 
-    @Override
-    protected String getOperator() {
-        return "/";
+    public static char getOperator() {
+        return '/';
     }
 }
