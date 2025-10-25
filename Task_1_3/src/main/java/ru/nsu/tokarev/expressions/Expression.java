@@ -1,13 +1,13 @@
 package ru.nsu.tokarev.expressions;
 
 import java.util.Map;
-
+import ru.nsu.tokarev.exceptions.ExpressionException;
 
 public abstract class Expression {
 
-    public abstract double eval(Map<String, Double> variables);
+    public abstract double eval(Map<String, Double> variables) throws ExpressionException;
 
-    public double eval(String variableString) {
+    public double eval(String variableString) throws ExpressionException {
         Map<String, Double> variables = parseVariables(variableString);
         return eval(variables);
     }
@@ -16,7 +16,7 @@ public abstract class Expression {
 
     public abstract String print();
 
-    public abstract Expression simplify();
+    public abstract Expression simplify() throws ExpressionException;
 
     public abstract boolean hasVariables();
 

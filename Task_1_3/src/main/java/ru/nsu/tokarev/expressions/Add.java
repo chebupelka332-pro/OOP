@@ -1,22 +1,28 @@
 package ru.nsu.tokarev.expressions;
 
 import java.util.Map;
+import ru.nsu.tokarev.exceptions.InvalidInputException;
+import ru.nsu.tokarev.exceptions.ExpressionException;
 
 
 public class Add extends BinaryOperation {
 
-    public Add(Expression left, Expression right) {
+    public Add(Expression left, Expression right) throws InvalidInputException {
         super(left, right);
     }
 
     @Override
-    public double eval(Map<String, Double> variables) {
+    public double eval(Map<String, Double> variables) throws ExpressionException {
         return left.eval(variables) + right.eval(variables);
     }
 
     @Override
     public Expression derivative(String variable) {
-        return new Add(left.derivative(variable), right.derivative(variable));
+        try {
+            return new Add(left.derivative(variable), right.derivative(variable));
+        } catch (InvalidInputException e) {
+            throw new RuntimeException("Error creating derivative expression", e);
+        }
     }
 
     @Override
@@ -25,7 +31,7 @@ public class Add extends BinaryOperation {
     }
 
     @Override
-    public Expression simplify() {
+    public Expression simplify() throws ExpressionException {
         Expression leftSimp = left.simplify();
         Expression rightSimp = right.simplify();
 
@@ -45,7 +51,16 @@ public class Add extends BinaryOperation {
             return leftSimp;
         }
 
-        return new Add(leftSimp, rightSimp);
+        // Return new Add if simplification was performed
+        if (!leftSimp.equals(left) || !rightSimp.equals(right)) {
+            try {
+                return new Add(leftSimp, rightSimp);
+            } catch (InvalidInputException e) {
+                throw new ExpressionException("Error creating simplified addition", e);
+            }
+        }
+
+        return this;
     }
 
     public static char getOperator() {

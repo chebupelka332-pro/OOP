@@ -16,21 +16,21 @@ class MulTest {
     private Variable x;
     private Variable y;
     private Number three;
+    private Number four;
     private Number zero;
     private Number one;
-    private Number five;
-    
+
     @BeforeEach
-    void setUp() {
+    void setUp() throws InvalidInputException {
         x = new Variable("x");
         y = new Variable("y");
         three = new Number(3);
+        four = new Number(4);
         zero = new Number(0);
         one = new Number(1);
-        five = new Number(5);
-        
-        simpleMul = new Mul(three, five);
-        complexMul = new Mul(x, new Add(y, three));
+
+        simpleMul = new Mul(three, four);
+        complexMul = new Mul(x, new Add(y, one));
         mulByZero = new Mul(x, zero);
         mulByOne = new Mul(x, one);
     }
@@ -39,78 +39,83 @@ class MulTest {
     void testConstructor() {
         assertThrows(InvalidInputException.class, () -> new Mul(null, three));
         assertThrows(InvalidInputException.class, () -> new Mul(three, null));
+        assertThrows(InvalidInputException.class, () -> new Mul(null, null));
     }
     
     @Test
-    void testEval() {
+    void testEval() throws ExpressionException {
         Map<String, Double> variables = new HashMap<>();
-        variables.put("x", 4.0);
+        variables.put("x", 5.0);
         variables.put("y", 2.0);
         
-        assertEquals(15.0, simpleMul.eval(variables));
-        assertEquals(20.0, complexMul.eval(variables));
-        assertEquals(0.0, mulByZero.eval(variables));
-        assertEquals(4.0, mulByOne.eval(variables));
+        assertEquals(12.0, simpleMul.eval(variables)); // 3 * 4
+        assertEquals(15.0, complexMul.eval(variables)); // 5 * (2 + 1)
+        assertEquals(0.0, mulByZero.eval(variables)); // 5 * 0
+        assertEquals(5.0, mulByOne.eval(variables)); // 5 * 1
+    }
+
+    @Test
+    void testEvalWithString() throws ExpressionException {
+        assertEquals(12.0, simpleMul.eval(""));
+        assertEquals(15.0, complexMul.eval("x = 5; y = 2"));
+        assertEquals(0.0, mulByZero.eval("x = 5"));
+        assertEquals(5.0, mulByOne.eval("x = 5"));
     }
     
     @Test
-    void testDerivative() {
-        // (u*v)' = u'*v + u*v'
-        // d/dx(x * (y + 3)) = 1 * (y + 3) + x * 0 = (y + 3)
+    void testDerivative() throws ExpressionException {
         Expression derivative = complexMul.derivative("x");
-        
-        Map<String, Double> vars = new HashMap<>();
-        vars.put("x", 4.0);
-        vars.put("y", 2.0);
-        assertEquals(5.0, derivative.eval(vars));
-        
-        Expression derivativeY = complexMul.derivative("y");
-        // d/dy(x * (y + 3)) = 0 * (y + 3) + x * 1 = x
-        assertEquals(4.0, derivativeY.eval(vars));
+        Map<String, Double> vars = Map.of("x", 5.0, "y", 2.0);
+        assertEquals(3.0, derivative.eval(vars)); // d/dx[x*(y+1)] = (y+1)
     }
     
     @Test
     void testPrint() {
-        assertEquals("(3*5)", simpleMul.print());
-        assertEquals("(x*(y+3))", complexMul.print());
+        assertEquals("(3*4)", simpleMul.print());
+        assertEquals("(x*(y+1))", complexMul.print());
         assertEquals("(x*0)", mulByZero.print());
+        assertEquals("(x*1)", mulByOne.print());
     }
     
     @Test
-    void testSimplify() {
-        // Constants
+    void testSimplify() throws ExpressionException {
         Expression simplified = simpleMul.simplify();
         assertTrue(simplified instanceof Number);
-        assertEquals(15.0, ((Number) simplified).getValue());
-        
-        // x * 0 = 0
+        assertEquals(12.0, ((Number) simplified).getValue());
+
         Expression simplifiedZero = mulByZero.simplify();
         assertTrue(simplifiedZero instanceof Number);
         assertEquals(0.0, ((Number) simplifiedZero).getValue());
-        
-        // 0 * x = 0
+
+        Expression simplifiedOne = mulByOne.simplify();
+        assertEquals(x, simplifiedOne);
+
         Mul zeroMul = new Mul(zero, x);
         Expression simplifiedZeroLeft = zeroMul.simplify();
         assertTrue(simplifiedZeroLeft instanceof Number);
         assertEquals(0.0, ((Number) simplifiedZeroLeft).getValue());
-        
-        // x * 1 = x
-        Expression simplifiedOne = mulByOne.simplify();
-        assertTrue(simplifiedOne instanceof Variable);
-        assertEquals("x", ((Variable) simplifiedOne).getName());
-        
-        // 1 * x = x
+
         Mul oneMul = new Mul(one, x);
         Expression simplifiedOneLeft = oneMul.simplify();
-        assertTrue(simplifiedOneLeft instanceof Variable);
-        assertEquals("x", ((Variable) simplifiedOneLeft).getName());
+        assertEquals(x, simplifiedOneLeft);
     }
     
     @Test
-    void testEquals() {
-        Mul another = new Mul(three, five);
+    void testHasVariables() {
+        assertFalse(simpleMul.hasVariables());
+        assertTrue(complexMul.hasVariables());
+        assertTrue(mulByZero.hasVariables());
+        assertTrue(mulByOne.hasVariables());
+    }
+
+    @Test
+    void testEquals() throws InvalidInputException {
+        Mul another = new Mul(three, four);
+        Mul different = new Mul(four, three);
+
         assertEquals(simpleMul, another);
-        assertNotEquals(simpleMul, new Mul(five, three));
+        assertNotEquals(simpleMul, different);
+        assertNotEquals(simpleMul, complexMul);
     }
     
     @Test

@@ -3,10 +3,10 @@ package ru.nsu.tokarev.parser;
 import ru.nsu.tokarev.expressions.*;
 import ru.nsu.tokarev.exceptions.InvalidInputException;
 import ru.nsu.tokarev.exceptions.ParseException;
-
+import ru.nsu.tokarev.exceptions.ExpressionException;
 
 public class ExpressionParser {
-    public static Expression parse(String input) {
+    public static Expression parse(String input) throws ParseException, InvalidInputException {
         if (input == null || input.trim().isEmpty()) {
             throw new InvalidInputException("Input cannot be null or empty");
         }
@@ -15,7 +15,7 @@ public class ExpressionParser {
         return parseWithPrecedence(trimmed);
     }
 
-    private static Expression parseWithPrecedence(String input) {
+    private static Expression parseWithPrecedence(String input) throws ParseException {
         int[] pos = new int[]{0};
         Expression result = parseAddSub(input.replaceAll("\\s+", ""), pos);
 
@@ -31,7 +31,7 @@ public class ExpressionParser {
         return result;
     }
     
-    private static Expression parseAddSub(String input, int[] pos) {
+    private static Expression parseAddSub(String input, int[] pos) throws ParseException {
         Expression left = parseMulDiv(input, pos);
         
         while (pos[0] < input.length()) {
@@ -39,7 +39,11 @@ public class ExpressionParser {
             if (op == Add.getOperator() || op == Sub.getOperator()) {
                 pos[0]++;
                 Expression right = parseMulDiv(input, pos);
-                left = (op == Add.getOperator()) ? new Add(left, right) : new Sub(left, right);
+                try {
+                    left = (op == Add.getOperator()) ? new Add(left, right) : new Sub(left, right);
+                } catch (InvalidInputException e) {
+                    throw new ParseException("Error creating operation", e);
+                }
             } else {
                 break;
             }
@@ -48,7 +52,7 @@ public class ExpressionParser {
         return left;
     }
     
-    private static Expression parseMulDiv(String input, int[] pos) {
+    private static Expression parseMulDiv(String input, int[] pos) throws ParseException {
         Expression left = parseFactor(input, pos);
         
         while (pos[0] < input.length()) {
@@ -56,7 +60,11 @@ public class ExpressionParser {
             if (op == Mul.getOperator() || op == Div.getOperator()) {
                 pos[0]++;
                 Expression right = parseFactor(input, pos);
-                left = (op == Mul.getOperator()) ? new Mul(left, right) : new Div(left, right);
+                try {
+                    left = (op == Mul.getOperator()) ? new Mul(left, right) : new Div(left, right);
+                } catch (InvalidInputException e) {
+                    throw new ParseException("Error creating operation", e);
+                }
             } else {
                 break;
             }
@@ -65,7 +73,7 @@ public class ExpressionParser {
         return left;
     }
     
-    private static Expression parseFactor(String input, int[] pos) {
+    private static Expression parseFactor(String input, int[] pos) throws ParseException {
         if (pos[0] >= input.length()) {
             throw new ParseException("Unexpected end of input");
         }
@@ -90,7 +98,7 @@ public class ExpressionParser {
         }
     }
     
-    private static Expression parseNumberAtPosition(String input, int[] pos) {
+    private static Expression parseNumberAtPosition(String input, int[] pos) throws ParseException {
         StringBuilder sb = new StringBuilder();
         
         if (pos[0] < input.length() && input.charAt(pos[0]) == Sub.getOperator()) {
@@ -111,7 +119,7 @@ public class ExpressionParser {
         }
     }
     
-    private static Expression parseVariableAtPosition(String input, int[] pos) {
+    private static Expression parseVariableAtPosition(String input, int[] pos) throws ParseException {
         StringBuilder sb = new StringBuilder();
         
         while (pos[0] < input.length() && Character.isLetterOrDigit(input.charAt(pos[0]))) {
@@ -119,6 +127,10 @@ public class ExpressionParser {
             pos[0]++;
         }
         
-        return new Variable(sb.toString());
+        try {
+            return new Variable(sb.toString());
+        } catch (InvalidInputException e) {
+            throw new ParseException("Error creating variable: " + sb.toString(), e);
+        }
     }
 }

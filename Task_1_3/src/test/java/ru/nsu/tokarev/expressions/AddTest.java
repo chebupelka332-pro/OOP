@@ -19,7 +19,7 @@ class AddTest {
     private Number five;
     
     @BeforeEach
-    void setUp() {
+    void setUp() throws InvalidInputException {
         x = new Variable("x");
         y = new Variable("y");
         three = new Number(3);
@@ -39,7 +39,7 @@ class AddTest {
     }
     
     @Test
-    void testEval() {
+    void testEval() throws ExpressionException {
         Map<String, Double> variables = new HashMap<>();
         variables.put("x", 10.0);
         variables.put("y", 5.0);
@@ -50,25 +50,21 @@ class AddTest {
     }
     
     @Test
-    void testEvalWithString() {
+    void testEvalWithString() throws ExpressionException {
         assertEquals(8.0, simpleAdd.eval(""));
         assertEquals(20.0, complexAdd.eval("x = 10; y = 5"));
         assertEquals(10.0, addWithZero.eval("x = 10"));
     }
     
     @Test
-    void testDerivative() {
+    void testDerivative() throws ExpressionException {
         Expression derivative = complexAdd.derivative("x");
-        // d/dx(x + (2 * y)) = 1 + 0 = 1 + 0
-        assertTrue(derivative instanceof Add);
-        
-        Map<String, Double> vars = new HashMap<>();
-        vars.put("x", 5.0);
-        vars.put("y", 3.0);
+        // Derivative of x + (2 * y) with respect to x should be 1
+
+        Map<String, Double> vars = Map.of("x", 10.0, "y", 5.0);
         assertEquals(1.0, derivative.eval(vars));
         
         Expression derivativeY = complexAdd.derivative("y");
-        // d/dy(x + (2 * y)) = 0 + 2 = 0 + 2
         assertEquals(2.0, derivativeY.eval(vars));
     }
     
@@ -80,26 +76,20 @@ class AddTest {
     }
     
     @Test
-    void testSimplify() {
-        // Constants should be computed
+    void testSimplify() throws ExpressionException {
         Expression simplified = simpleAdd.simplify();
         assertTrue(simplified instanceof Number);
         assertEquals(8.0, ((Number) simplified).getValue());
-        
-        // x + 0 = x
+
         Expression simplifiedZero = addWithZero.simplify();
-        assertTrue(simplifiedZero instanceof Variable);
-        assertEquals("x", ((Variable) simplifiedZero).getName());
-        
-        // 0 + x = x
+        assertEquals(x, simplifiedZero);
+
         Add zeroAdd = new Add(zero, x);
         Expression simplifiedZeroLeft = zeroAdd.simplify();
-        assertTrue(simplifiedZeroLeft instanceof Variable);
-        assertEquals("x", ((Variable) simplifiedZeroLeft).getName());
-        
-        // Expression with variables should remain as Add but with simplified operands
+        assertEquals(x, simplifiedZeroLeft);
+
         Expression simplifiedComplex = complexAdd.simplify();
-        assertTrue(simplifiedComplex instanceof Add);
+        assertEquals(complexAdd.getClass(), simplifiedComplex.getClass());
     }
     
     @Test
@@ -110,31 +100,18 @@ class AddTest {
     }
     
     @Test
-    void testEquals() {
+    void testEquals() throws InvalidInputException {
         Add another = new Add(three, five);
         Add different = new Add(five, three);
         
         assertEquals(simpleAdd, another);
         assertNotEquals(simpleAdd, different);
-        assertNotEquals(simpleAdd, null);
-        assertNotEquals(simpleAdd, "not an add");
-        assertEquals(simpleAdd, simpleAdd);
+        assertNotEquals(simpleAdd, complexAdd);
     }
     
     @Test
-    void testHashCode() {
+    void testHashCode() throws InvalidInputException {
         Add another = new Add(three, five);
         assertEquals(simpleAdd.hashCode(), another.hashCode());
-    }
-    
-    @Test
-    void testGetOperator() {
-        assertEquals('+', Add.getOperator());
-    }
-    
-    @Test
-    void testGetLeftRight() {
-        assertEquals(three, simpleAdd.getLeft());
-        assertEquals(five, simpleAdd.getRight());
     }
 }

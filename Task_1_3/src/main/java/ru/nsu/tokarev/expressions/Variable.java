@@ -4,12 +4,13 @@ import java.util.Map;
 import java.util.Objects;
 import ru.nsu.tokarev.exceptions.InvalidInputException;
 import ru.nsu.tokarev.exceptions.VariableNotDefinedException;
+import ru.nsu.tokarev.exceptions.ExpressionException;
 
 
 public class Variable extends Expression {
     private final String name;
 
-    public Variable(String name) {
+    public Variable(String name) throws InvalidInputException {
         if (name == null || name.trim().isEmpty()) {
             throw new InvalidInputException("Variable name cannot be null or empty");
         }
@@ -17,7 +18,7 @@ public class Variable extends Expression {
     }
 
     @Override
-    public double eval(Map<String, Double> variables) {
+    public double eval(Map<String, Double> variables) throws VariableNotDefinedException {
         if (!variables.containsKey(name)) {
             throw new VariableNotDefinedException(name);
         }
@@ -35,7 +36,7 @@ public class Variable extends Expression {
     }
 
     @Override
-    public Expression simplify() {
+    public Expression simplify() throws ExpressionException {
         return this; // Variables cannot be simplified without values
     }
 

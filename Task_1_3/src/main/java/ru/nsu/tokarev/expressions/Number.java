@@ -2,6 +2,7 @@ package ru.nsu.tokarev.expressions;
 
 import java.util.Map;
 import java.util.Objects;
+import ru.nsu.tokarev.exceptions.ExpressionException;
 
 
 public class Number extends Expression {
@@ -12,7 +13,7 @@ public class Number extends Expression {
     }
 
     @Override
-    public double eval(Map<String, Double> variables) {
+    public double eval(Map<String, Double> variables) throws ExpressionException {
         return value;
     }
 
@@ -30,7 +31,7 @@ public class Number extends Expression {
     }
 
     @Override
-    public Expression simplify() {
+    public Expression simplify() throws ExpressionException {
         return this; // Numbers are already simplified
     }
 

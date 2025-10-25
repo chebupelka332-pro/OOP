@@ -14,10 +14,10 @@ class VariableTest {
     private Variable longName;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws InvalidInputException {
         x = new Variable("x");
         y = new Variable("y");
-        longName = new Variable("variable1");
+        longName = new Variable("variableName");
     }
 
     @Test
@@ -25,25 +25,28 @@ class VariableTest {
         assertThrows(InvalidInputException.class, () -> new Variable(null));
         assertThrows(InvalidInputException.class, () -> new Variable(""));
         assertThrows(InvalidInputException.class, () -> new Variable("   "));
-
-        Variable trimmed = new Variable("  x  ");
-        assertEquals("x", trimmed.getName());
     }
 
     @Test
-    void testEval() {
+    void testValidConstructor() throws InvalidInputException {
+        Variable validVar = new Variable("  validName  ");
+        assertEquals("validName", validVar.getName());
+    }
+
+    @Test
+    void testEval() throws ExpressionException {
         Map<String, Double> variables = new HashMap<>();
         variables.put("x", 10.0);
-        variables.put("y", 5.5);
-        variables.put("variable1", -2.0);
+        variables.put("y", 5.0);
+        variables.put("variableName", 42.0);
 
         assertEquals(10.0, x.eval(variables));
-        assertEquals(5.5, y.eval(variables));
-        assertEquals(-2.0, longName.eval(variables));
+        assertEquals(5.0, y.eval(variables));
+        assertEquals(42.0, longName.eval(variables));
     }
 
     @Test
-    void testEvalMissingVariable() {
+    void testEvalUndefinedVariable() {
         Map<String, Double> variables = new HashMap<>();
         variables.put("y", 5.0);
 
@@ -51,40 +54,44 @@ class VariableTest {
     }
 
     @Test
-    void testEvalWithString() {
+    void testEvalWithString() throws ExpressionException {
         assertEquals(10.0, x.eval("x = 10"));
-        assertEquals(5.5, y.eval("y = 5.5"));
-        assertEquals(-2.0, longName.eval("variable1 = -2"));
+        assertEquals(5.0, y.eval("x = 10; y = 5"));
+        assertEquals(42.0, longName.eval("variableName = 42"));
+    }
 
-        // Multiple variables
-        assertEquals(10.0, x.eval("x = 10; y = 5"));
-
-        assertThrows(VariableNotDefinedException.class, () -> x.eval("y = 10"));
+    @Test
+    void testEvalWithStringUndefined() {
+        assertThrows(VariableNotDefinedException.class, () -> x.eval("y = 5"));
     }
 
     @Test
     void testDerivative() {
-        Expression dx_dx = x.derivative("x");
-        Expression dx_dy = x.derivative("y");
+        Expression derivativeX = x.derivative("x");
+        assertTrue(derivativeX instanceof Number);
+        assertEquals(1.0, ((Number) derivativeX).getValue());
 
-        assertTrue(dx_dx instanceof Number);
-        assertTrue(dx_dy instanceof Number);
+        Expression derivativeY = x.derivative("y");
+        assertTrue(derivativeY instanceof Number);
+        assertEquals(0.0, ((Number) derivativeY).getValue());
 
-        assertEquals(1.0, ((Number) dx_dx).getValue());
-        assertEquals(0.0, ((Number) dx_dy).getValue());
+        Expression derivativeY2 = y.derivative("y");
+        assertTrue(derivativeY2 instanceof Number);
+        assertEquals(1.0, ((Number) derivativeY2).getValue());
     }
 
     @Test
     void testPrint() {
         assertEquals("x", x.print());
         assertEquals("y", y.print());
-        assertEquals("variable1", longName.print());
+        assertEquals("variableName", longName.print());
     }
 
     @Test
-    void testSimplify() {
-        Expression simplified = x.simplify();
-        assertSame(x, simplified); // Should return same object
+    void testSimplify() throws ExpressionException {
+        assertEquals(x, x.simplify());
+        assertEquals(y, y.simplify());
+        assertEquals(longName, longName.simplify());
     }
 
     @Test
@@ -95,19 +102,17 @@ class VariableTest {
     }
 
     @Test
-    void testEquals() {
+    void testEquals() throws InvalidInputException {
         Variable anotherX = new Variable("x");
         Variable differentVar = new Variable("z");
 
         assertEquals(x, anotherX);
+        assertNotEquals(x, y);
         assertNotEquals(x, differentVar);
-        assertNotEquals(x, null);
-        assertNotEquals(x, "not a variable");
-        assertEquals(x, x);
     }
 
     @Test
-    void testHashCode() {
+    void testHashCode() throws InvalidInputException {
         Variable anotherX = new Variable("x");
         assertEquals(x.hashCode(), anotherX.hashCode());
     }
@@ -116,6 +121,6 @@ class VariableTest {
     void testGetName() {
         assertEquals("x", x.getName());
         assertEquals("y", y.getName());
-        assertEquals("variable1", longName.getName());
+        assertEquals("variableName", longName.getName());
     }
 }

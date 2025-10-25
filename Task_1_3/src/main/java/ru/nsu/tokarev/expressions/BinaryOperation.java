@@ -9,7 +9,7 @@ public abstract class BinaryOperation extends Expression {
     protected final Expression left;
     protected final Expression right;
 
-    public BinaryOperation(Expression left, Expression right) {
+    public BinaryOperation(Expression left, Expression right) throws InvalidInputException {
         if (left == null || right == null) {
             throw new InvalidInputException("Operands cannot be null");
         }

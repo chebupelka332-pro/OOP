@@ -2,16 +2,18 @@ package ru.nsu.tokarev.expressions;
 
 import java.util.Map;
 import ru.nsu.tokarev.exceptions.DivisionByZeroException;
+import ru.nsu.tokarev.exceptions.InvalidInputException;
+import ru.nsu.tokarev.exceptions.ExpressionException;
 
 
 public class Div extends BinaryOperation {
 
-    public Div(Expression left, Expression right) {
+    public Div(Expression left, Expression right) throws InvalidInputException {
         super(left, right);
     }
 
     @Override
-    public double eval(Map<String, Double> variables) {
+    public double eval(Map<String, Double> variables) throws ExpressionException {
         double rightValue = right.eval(variables);
         if (rightValue == 0) {
             throw new DivisionByZeroException();
@@ -22,13 +24,17 @@ public class Div extends BinaryOperation {
     @Override
     public Expression derivative(String variable) {
         // (u/v)' = (u'*v - u*v') / v^2
-        return new Div(
-            new Sub(
-                new Mul(left.derivative(variable), right),
-                new Mul(left, right.derivative(variable))
-            ),
-            new Mul(right, right)
-        );
+        try {
+            return new Div(
+                new Sub(
+                    new Mul(left.derivative(variable), right),
+                    new Mul(left, right.derivative(variable))
+                ),
+                new Mul(right, right)
+            );
+        } catch (InvalidInputException e) {
+            throw new RuntimeException("Error creating derivative expression", e);
+        }
     }
 
     @Override
@@ -37,7 +43,7 @@ public class Div extends BinaryOperation {
     }
 
     @Override
-    public Expression simplify() {
+    public Expression simplify() throws ExpressionException {
         Expression leftSimp = left.simplify();
         Expression rightSimp = right.simplify();
 
@@ -61,12 +67,21 @@ public class Div extends BinaryOperation {
             return leftSimp;
         }
 
-        // expr / expr = 1
+        // expr / expr = 1 (assuming expr != 0)
         if (leftSimp.equals(rightSimp)) {
             return new Number(1);
         }
 
-        return new Div(leftSimp, rightSimp);
+        // Return new Div if simplification was performed
+        if (!leftSimp.equals(left) || !rightSimp.equals(right)) {
+            try {
+                return new Div(leftSimp, rightSimp);
+            } catch (InvalidInputException e) {
+                throw new ExpressionException("Error creating simplified division", e);
+            }
+        }
+
+        return this;
     }
 
     public static char getOperator() {

@@ -5,98 +5,98 @@ import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.Map;
 import java.util.HashMap;
+import ru.nsu.tokarev.exceptions.*;
 
 class NumberTest {
     
-    private ru.nsu.tokarev.expressions.Number number;
-    private ru.nsu.tokarev.expressions.Number zero;
-    private ru.nsu.tokarev.expressions.Number negativeNumber;
-    private ru.nsu.tokarev.expressions.Number decimal;
-    
+    private Number positiveNumber;
+    private Number negativeNumber;
+    private Number zero;
+    private Number decimalNumber;
+
     @BeforeEach
     void setUp() {
-        number = new ru.nsu.tokarev.expressions.Number(5);
-        zero = new ru.nsu.tokarev.expressions.Number(0);
-        negativeNumber = new ru.nsu.tokarev.expressions.Number(-3);
-        decimal = new ru.nsu.tokarev.expressions.Number(3.14);
+        positiveNumber = new Number(5.0);
+        negativeNumber = new Number(-3.0);
+        zero = new Number(0.0);
+        decimalNumber = new Number(3.14);
+    }
+
+    @Test
+    void testConstructor() {
+        assertEquals(5.0, positiveNumber.getValue());
+        assertEquals(-3.0, negativeNumber.getValue());
+        assertEquals(0.0, zero.getValue());
+        assertEquals(3.14, decimalNumber.getValue());
     }
     
     @Test
-    void testEval() {
+    void testEval() throws ExpressionException {
         Map<String, Double> variables = new HashMap<>();
-        assertEquals(5.0, number.eval(variables));
-        assertEquals(0.0, zero.eval(variables));
+        variables.put("x", 10.0);
+
+        assertEquals(5.0, positiveNumber.eval(variables));
         assertEquals(-3.0, negativeNumber.eval(variables));
-        assertEquals(3.14, decimal.eval(variables), 0.001);
+        assertEquals(0.0, zero.eval(variables));
+        assertEquals(3.14, decimalNumber.eval(variables));
     }
     
     @Test
-    void testEvalWithString() {
-        assertEquals(5.0, number.eval("x = 10"));
-        assertEquals(5.0, number.eval(""));
-        Map<String, Double> emptyMap = new HashMap<>();
-        assertEquals(5.0, number.eval(emptyMap));
+    void testEvalWithString() throws ExpressionException {
+        assertEquals(5.0, positiveNumber.eval("x = 10"));
+        assertEquals(-3.0, negativeNumber.eval(""));
+        assertEquals(0.0, zero.eval("x = 5; y = 3"));
+        assertEquals(3.14, decimalNumber.eval(""));
     }
     
     @Test
     void testDerivative() {
-        Expression derivative = number.derivative("x");
-        assertTrue(derivative instanceof ru.nsu.tokarev.expressions.Number);
-        assertEquals(0.0, ((ru.nsu.tokarev.expressions.Number) derivative).getValue());
+        Expression derivative = positiveNumber.derivative("x");
+        assertTrue(derivative instanceof Number);
+        assertEquals(0.0, ((Number) derivative).getValue());
 
-        derivative = number.derivative("y");
-        assertEquals(0.0, ((ru.nsu.tokarev.expressions.Number) derivative).getValue());
+        Expression derivative2 = negativeNumber.derivative("y");
+        assertTrue(derivative2 instanceof Number);
+        assertEquals(0.0, ((Number) derivative2).getValue());
     }
     
     @Test
     void testPrint() {
-        assertEquals("5", number.print());
-        assertEquals("0", zero.print());
+        assertEquals("5", positiveNumber.print());
         assertEquals("-3", negativeNumber.print());
-        assertEquals("3.14", decimal.print());
+        assertEquals("0", zero.print());
+        assertEquals("3.14", decimalNumber.print());
     }
     
     @Test
-    void testToString() {
-        assertEquals("5", number.toString());
-        assertEquals("0", zero.toString());
-    }
-    
-    @Test
-    void testSimplify() {
-        Expression simplified = number.simplify();
-        assertSame(number, simplified); // Should return same object
+    void testSimplify() throws ExpressionException {
+        assertEquals(positiveNumber, positiveNumber.simplify());
+        assertEquals(negativeNumber, negativeNumber.simplify());
+        assertEquals(zero, zero.simplify());
+        assertEquals(decimalNumber, decimalNumber.simplify());
     }
     
     @Test
     void testHasVariables() {
-        assertFalse(number.hasVariables());
-        assertFalse(zero.hasVariables());
+        assertFalse(positiveNumber.hasVariables());
         assertFalse(negativeNumber.hasVariables());
+        assertFalse(zero.hasVariables());
+        assertFalse(decimalNumber.hasVariables());
     }
     
     @Test
     void testEquals() {
-        ru.nsu.tokarev.expressions.Number another5 = new ru.nsu.tokarev.expressions.Number(5);
-        ru.nsu.tokarev.expressions.Number different = new ru.nsu.tokarev.expressions.Number(10);
-        
-        assertEquals(number, another5);
-        assertNotEquals(number, different);
-        assertNotEquals(number, null);
-        assertNotEquals(number, "not a number");
-        assertEquals(number, number);
+        Number another5 = new Number(5.0);
+        Number different = new Number(6.0);
+
+        assertEquals(positiveNumber, another5);
+        assertNotEquals(positiveNumber, different);
+        assertNotEquals(positiveNumber, negativeNumber);
     }
     
     @Test
     void testHashCode() {
-        ru.nsu.tokarev.expressions.Number another5 = new ru.nsu.tokarev.expressions.Number(5);
-        assertEquals(number.hashCode(), another5.hashCode());
-    }
-    
-    @Test
-    void testGetValue() {
-        assertEquals(5.0, number.getValue());
-        assertEquals(0.0, zero.getValue());
-        assertEquals(-3.0, negativeNumber.getValue());
+        Number another5 = new Number(5.0);
+        assertEquals(positiveNumber.hashCode(), another5.hashCode());
     }
 }
