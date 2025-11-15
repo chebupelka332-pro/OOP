@@ -12,6 +12,9 @@ import java.nio.charset.StandardCharsets;
 public class SubstringFinder {
     private static final int BUFFER_SIZE = 1024 * 1024; // 1MB
 
+    private SubstringFinder() {
+    }
+
     public static List<Integer> find(String fileName, String pattern, Charset encoding) throws IOException {
         List<Integer> res = new ArrayList<>();
 
