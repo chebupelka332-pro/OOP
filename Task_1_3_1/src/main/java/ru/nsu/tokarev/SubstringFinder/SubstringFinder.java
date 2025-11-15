@@ -12,7 +12,7 @@ import java.nio.charset.StandardCharsets;
 public class SubstringFinder {
     private static final int BUFFER_SIZE = 1024 * 1024; // 1MB
 
-    public List<Integer> find(String fileName, String pattern, Charset encoding) throws IOException {
+    public static List<Integer> find(String fileName, String pattern, Charset encoding) throws IOException {
         List<Integer> res = new ArrayList<>();
 
         if (pattern == null || pattern.isEmpty()) {
@@ -58,11 +58,11 @@ public class SubstringFinder {
         return res;
     }
 
-    public List<Integer> find(String fileName, String pattern) throws IOException {
+    public static List<Integer> find(String fileName, String pattern) throws IOException {
         return find(fileName, pattern, StandardCharsets.UTF_8);
     }
 
-    private List<Integer> KMPSearch(byte[] text, int textLength, byte[] pattern, int[] lps) {
+    private static List<Integer> KMPSearch(byte[] text, int textLength, byte[] pattern, int[] lps) {
         int textIndex = 0;
         int patternIndex = 0;
         List<Integer> res = new ArrayList<>();
@@ -87,7 +87,7 @@ public class SubstringFinder {
         return res;
     }
 
-    private int[] calculateLPSArray(byte[] pattern) {
+    private static int[] calculateLPSArray(byte[] pattern) {
         int[] res = new int[pattern.length];
         res[0] = 0;
         for (int i = 1; i < pattern.length; i++) {

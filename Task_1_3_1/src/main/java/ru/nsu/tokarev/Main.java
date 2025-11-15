@@ -8,29 +8,27 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        SubstringFinder finder = new SubstringFinder();
-
         try {
             createTestFile();
 
             // Поиск простой подстроки
-            List<Integer> results = finder.find("test_file.txt", "test");
+            List<Integer> results = SubstringFinder.find("test_file.txt", "test");
             System.out.println("Found 'test' positions: " + results);
 
             // Поиск с указанием кодировки
-            results = finder.find("test_file.txt", "Hello", StandardCharsets.UTF_8);
+            results = SubstringFinder.find("test_file.txt", "Hello", StandardCharsets.UTF_8);
             System.out.println("Found 'Hello' positions: " + results);
 
             // Поиск несуществующей подстроки
-            results = finder.find("test_file.txt", "xyz");
+            results = SubstringFinder.find("test_file.txt", "xyz");
             System.out.println("Found 'xyz' positions: " + results);
 
             // Поиск подстроки, встречающейся несколько раз
-            results = finder.find("test_file.txt", "is");
+            results = SubstringFinder.find("test_file.txt", "is");
             System.out.println("Found 'is' positions: " + results);
 
             // Поиск одного символа
-            results = finder.find("test_file.txt", "o");
+            results = SubstringFinder.find("test_file.txt", "o");
             System.out.println("Found 'o' positions: " + results);
 
         } catch (IOException e) {
