@@ -1,5 +1,7 @@
 package ru.nsu.tokarev;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import ru.nsu.tokarev.SubstringFinder.SubstringFinder;
@@ -9,17 +11,34 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class SubstringFinderTest {
 
-    private SubstringFinder substringFinder;
-
     @TempDir
     Path tempDir;
 
+    private List<Path> createdFiles = new ArrayList<>();
+
+    @BeforeEach
+    void setUp() {
+        createdFiles.clear();
+    }
+
+    @AfterEach
+    void tearDown() throws IOException {
+        for (Path file : createdFiles) {
+            try {
+                Files.deleteIfExists(file);
+            } catch (IOException e) {
+                System.err.println("Warning: Could not delete test file " + file + ": " + e.getMessage());
+            }
+        }
+        createdFiles.clear();
+    }
 
     @Test
     void testSimpleSubstringSearch() throws IOException {
@@ -94,15 +113,13 @@ class SubstringFinderTest {
 
     @Test
     void testLargeFile() throws IOException {
-        // Создаем файл размером больше буфера (1MB)
         StringBuilder content = new StringBuilder();
         String pattern = "SEARCH_ME";
 
-        // Добавляем данные до 2MB
         for (int i = 0; i < 100000; i++) {
             content.append("This is line number ").append(i).append(". ");
             if (i == 50000) {
-                content.append(pattern); // Вставляем паттерн посередине
+                content.append(pattern);
             }
         }
 
@@ -116,7 +133,6 @@ class SubstringFinderTest {
 
     @Test
     void testPatternAcrossBufferBoundary() throws IOException {
-        // Создаем контент, где паттерн может оказаться на границе буфера
         StringBuilder content = new StringBuilder();
         String pattern = "BOUNDARY_PATTERN";
 
@@ -186,6 +202,80 @@ class SubstringFinderTest {
         });
     }
 
+    @Test
+    void testEmojiAndJapaneseCharacters() throws IOException {
+        String content = "Hello 😊 world 😊 test 😊 end";
+        String pattern = "😊";
+
+        Path testFile = createTestFile(content, StandardCharsets.UTF_8);
+        List<Integer> results = SubstringFinder.find(testFile.toString(), pattern, StandardCharsets.UTF_8);
+
+        assertEquals(3, results.size());
+        assertTrue(results.get(0) >= 0);
+        assertTrue(results.get(1) > results.get(0));
+        assertTrue(results.get(2) > results.get(1));
+
+        String japaneseContent = "こんにちは world こんにちは test";
+        String japanesePattern = "こんにちは";
+        Path japaneseTestFile = createTestFile(japaneseContent, StandardCharsets.UTF_8);
+        List<Integer> japaneseResults = SubstringFinder.find(japaneseTestFile.toString(), japanesePattern, StandardCharsets.UTF_8);
+
+        assertEquals(2, japaneseResults.size());
+        assertEquals(0, japaneseResults.get(0));
+        assertTrue(japaneseResults.get(1) > japaneseResults.get(0));
+    }
+
+    @Test
+    void testVeryLargeFile() throws IOException {
+        Path largeTestFile = tempDir.resolve("large_test_file.txt");
+        createdFiles.add(largeTestFile);
+
+        String pattern = "LARGE_FILE_SEARCH_TARGET";
+        String block = "This is a repeated block of text that will be written many times to create a large file for testing. ";
+
+        long targetSizeMB = 50L * 1024 * 1024; // 50 МБ
+        long blockSize = block.getBytes(StandardCharsets.UTF_8).length;
+        long blocksNeeded = targetSizeMB / blockSize;
+
+        long patternInsertBlock = blocksNeeded / 2;
+
+        try (java.io.BufferedWriter writer = Files.newBufferedWriter(largeTestFile, StandardCharsets.UTF_8)) {
+            for (long i = 0; i < blocksNeeded; i++) {
+                writer.write(block);
+
+                if (i == patternInsertBlock) {
+                    writer.write(pattern);
+                }
+
+                if (i % 100000 == 0 && i > 0) {
+                    System.out.println("Written " + (i * blockSize / (1024 * 1024)) + " MB");
+                }
+            }
+        }
+
+        try {
+            long fileSize = Files.size(largeTestFile);
+            assertTrue(fileSize > 25L * 1024 * 1024, "File should be larger than 25MB");
+            System.out.println("Created test file of size: " + (fileSize / (1024 * 1024)) + " MB");
+
+            long startTime = System.currentTimeMillis();
+            List<Integer> results = SubstringFinder.find(largeTestFile.toString(), pattern, StandardCharsets.UTF_8);
+            long searchTime = System.currentTimeMillis() - startTime;
+
+            assertEquals(1, results.size());
+            assertTrue(results.get(0) > 0);
+            System.out.println("Pattern found at position: " + results.get(0));
+            System.out.println("Search completed in " + searchTime + " ms");
+        } finally {
+            try {
+                Files.deleteIfExists(largeTestFile);
+                createdFiles.remove(largeTestFile);
+            } catch (IOException e) {
+                System.err.println("Warning: Could not delete large test file immediately: " + e.getMessage());
+            }
+        }
+    }
+
     private Path createTestFile(String content) throws IOException {
         return createTestFile(content, StandardCharsets.UTF_8);
     }
@@ -193,6 +283,7 @@ class SubstringFinderTest {
     private Path createTestFile(String content, Charset encoding) throws IOException {
         Path testFile = tempDir.resolve("test_file.txt");
         Files.write(testFile, content.getBytes(encoding));
+        createdFiles.add(testFile);
         return testFile;
     }
 }
