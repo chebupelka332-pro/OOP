@@ -1,7 +1,7 @@
 package ru.nsu.tokarev.SubstringFinder;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -22,22 +22,21 @@ public class SubstringFinder {
             return res;
         }
 
-        byte[] patternBytes = pattern.getBytes(encoding);
-        int patternLength = patternBytes.length;
+        int patternLength = pattern.length();
         int overlapSize = patternLength - 1;
         long globalOffset = 0;
         boolean firstChunk = true;
 
-        int[] lps = calculateLPSArray(patternBytes);
-        byte[] buffer = new byte[BUFFER_SIZE + overlapSize];
+        int[] lps = calculateLPSArray(pattern);
+        char[] buffer = new char[BUFFER_SIZE + overlapSize];
 
-        try (InputStream inputStream = new FileInputStream(fileName)) {
-            int bytesRead = inputStream.read(buffer, overlapSize, BUFFER_SIZE);
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName, encoding))) {
+            int charsRead = reader.read(buffer, overlapSize, BUFFER_SIZE);
 
-            while (bytesRead != -1) {
-                int searchLength = overlapSize + bytesRead;
+            while (charsRead != -1) {
+                int searchLength = overlapSize + charsRead;
 
-                List<Integer> matches = KMPSearch(buffer, searchLength, patternBytes, lps);
+                List<Integer> matches = KMPSearch(buffer, searchLength, pattern, lps);
 
                 for (Integer matchPos : matches) {
                     long absolutePos = globalOffset + matchPos - overlapSize;
@@ -47,14 +46,14 @@ public class SubstringFinder {
                     }
                 }
 
-                globalOffset += bytesRead;
+                globalOffset += charsRead;
 
-                if (overlapSize > 0 && bytesRead > 0) {
+                if (overlapSize > 0 && charsRead > 0) {
                     System.arraycopy(buffer, searchLength - overlapSize, buffer, 0, overlapSize);
                 }
 
                 firstChunk = false;
-                bytesRead = inputStream.read(buffer, overlapSize, BUFFER_SIZE);
+                charsRead = reader.read(buffer, overlapSize, BUFFER_SIZE);
             }
         }
 
@@ -65,16 +64,16 @@ public class SubstringFinder {
         return find(fileName, pattern, StandardCharsets.UTF_8);
     }
 
-    private static List<Integer> KMPSearch(byte[] text, int textLength, byte[] pattern, int[] lps) {
+    private static List<Integer> KMPSearch(char[] text, int textLength, String pattern, int[] lps) {
         int textIndex = 0;
         int patternIndex = 0;
         List<Integer> res = new ArrayList<>();
 
         while (textIndex < textLength) {
-            if (text[textIndex] == pattern[patternIndex]) {
+            if (text[textIndex] == pattern.charAt(patternIndex)) {
                 textIndex++;
                 patternIndex++;
-                if (patternIndex == pattern.length) {
+                if (patternIndex == pattern.length()) {
                     res.add(textIndex - patternIndex);
                     patternIndex = lps[patternIndex - 1];
                 }
@@ -90,15 +89,15 @@ public class SubstringFinder {
         return res;
     }
 
-    private static int[] calculateLPSArray(byte[] pattern) {
-        int[] res = new int[pattern.length];
+    private static int[] calculateLPSArray(String pattern) {
+        int[] res = new int[pattern.length()];
         res[0] = 0;
-        for (int i = 1; i < pattern.length; i++) {
+        for (int i = 1; i < pattern.length(); i++) {
             int len = res[i - 1];
-            while (len > 0 && pattern[i] != pattern[len]) {
+            while (len > 0 && pattern.charAt(i) != pattern.charAt(len)) {
                 len = res[len - 1];
             }
-            if (pattern[i] == pattern[len]) {
+            if (pattern.charAt(i) == pattern.charAt(len)) {
                 len++;
             }
             res[i] = len;
