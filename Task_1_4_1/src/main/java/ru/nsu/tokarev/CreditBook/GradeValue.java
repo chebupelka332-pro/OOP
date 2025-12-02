@@ -1,6 +1,10 @@
 package ru.nsu.tokarev.CreditBook;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
+@Getter
+@AllArgsConstructor
 public enum GradeValue {
     EXCELLENT(5, "excellent"),
     GOOD(4, "good"),
@@ -9,19 +13,6 @@ public enum GradeValue {
 
     private final int numericValue;
     private final String description;
-
-    GradeValue(int numericValue, String description) {
-        this.numericValue = numericValue;
-        this.description = description;
-    }
-
-    public int getNumericValue() {
-        return numericValue;
-    }
-
-    public String getDescription() {
-        return description;
-    }
 
     public static GradeValue fromNumeric(int value) {
         for (GradeValue grade : values()) {

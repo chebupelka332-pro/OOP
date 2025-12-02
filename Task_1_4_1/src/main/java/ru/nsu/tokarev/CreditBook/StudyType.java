@@ -1,17 +1,13 @@
 package ru.nsu.tokarev.CreditBook;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
+@Getter
+@AllArgsConstructor
 public enum StudyType {
     BUDGET("budget"),
     PAID("paid");
 
     private final String description;
-
-    StudyType(String description) {
-        this.description = description;
-    }
-
-    public String getDescription() {
-        return description;
-    }
 }

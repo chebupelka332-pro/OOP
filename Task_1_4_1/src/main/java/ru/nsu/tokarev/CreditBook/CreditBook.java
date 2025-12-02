@@ -1,15 +1,20 @@
 package ru.nsu.tokarev.CreditBook;
 
+import lombok.Getter;
+import lombok.Setter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
+@Getter
 public class CreditBook {
     private final String studentName;
     private final String studentId;
+    @Setter
     private StudyType studyType;
     private final List<Grade> grades;
+    @Setter
     private GradeValue qualificationWorkGrade;
+    @Setter
     private boolean isQualificationWorkCompleted;
 
     public CreditBook(String studentName, String studentId, StudyType studyType) {
@@ -22,11 +27,6 @@ public class CreditBook {
 
     public void addGrade(Grade grade) {
         grades.add(grade);
-    }
-
-    public void setQualificationWorkGrade(GradeValue grade) {
-        this.qualificationWorkGrade = grade;
-        this.isQualificationWorkCompleted = true;
     }
 
     public double calculateGPA() {
@@ -116,20 +116,6 @@ public class CreditBook {
         return allGoodOrExcellent && hasExcellent;
     }
 
-    private Map<String, Grade> getLatestGradesBySubject() {
-        return grades.stream()
-                .collect(Collectors.groupingBy(
-                        Grade::getSubjectName,
-                        Collectors.maxBy(Comparator.comparing(Grade::getDate))
-                ))
-                .entrySet().stream()
-                .filter(entry -> entry.getValue().isPresent())
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> entry.getValue().get()
-                ));
-    }
-
     public boolean transferToBudget() {
         if (canTransferToBudget()) {
             this.studyType = StudyType.BUDGET;
@@ -138,28 +124,8 @@ public class CreditBook {
         return false;
     }
 
-    public String getStudentName() {
-        return studentName;
-    }
-
-    public String getStudentId() {
-        return studentId;
-    }
-
-    public StudyType getStudyType() {
-        return studyType;
-    }
-
     public List<Grade> getGrades() {
         return new ArrayList<>(grades);
-    }
-
-    public GradeValue getQualificationWorkGrade() {
-        return qualificationWorkGrade;
-    }
-
-    public boolean isQualificationWorkCompleted() {
-        return isQualificationWorkCompleted;
     }
 
     public List<Grade> getGradesForSemester(int semester) {
@@ -188,5 +154,19 @@ public class CreditBook {
                            "Number of grades: %d",
                            studentName, studentId, studyType.getDescription(),
                            calculateGPA(), grades.size());
+    }
+
+    private Map<String, Grade> getLatestGradesBySubject() {
+        return grades.stream()
+                .collect(Collectors.groupingBy(
+                        Grade::getSubjectName,
+                        Collectors.maxBy(Comparator.comparing(Grade::getDate))
+                ))
+                .entrySet().stream()
+                .filter(entry -> entry.getValue().isPresent())
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> entry.getValue().get()
+                ));
     }
 }
