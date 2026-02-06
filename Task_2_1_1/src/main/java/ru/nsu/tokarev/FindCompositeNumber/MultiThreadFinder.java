@@ -2,8 +2,8 @@ package ru.nsu.tokarev.FindCompositeNumber;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class MultiThreadFinder {
-    public boolean containsComposite(int[] numbers, int numberOfThreads) {
+public class MultiThreadFinder implements CompositeFinder{
+    public boolean containsCompositeThreadCount(int[] numbers, int numberOfThreads) {
         int len = numbers.length;
         if (len == 0) return false;
 
@@ -38,5 +38,9 @@ public class MultiThreadFinder {
         }
 
         return found.get();
+    }
+
+    public boolean containsComposite(int[] numbers) {
+        return containsCompositeThreadCount(numbers, 4);
     }
 }

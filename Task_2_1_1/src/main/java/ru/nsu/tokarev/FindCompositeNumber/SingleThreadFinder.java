@@ -1,6 +1,6 @@
 package ru.nsu.tokarev.FindCompositeNumber;
 
-public class SingleThreadFinder {
+public class SingleThreadFinder implements CompositeFinder{
     public boolean containsComposite(int[] numbers) {
         for (int number : numbers) {
             if (!isPrime(number)) {

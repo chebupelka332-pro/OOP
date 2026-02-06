@@ -16,7 +16,9 @@ public class FinderTest {
         assertTrue(parallelStream.containsComposite(input));
 
         MultiThreadFinder multiThread = new MultiThreadFinder();
-        assertTrue(multiThread.containsComposite(input, 4));
+        assertTrue(multiThread.containsComposite(input));
+
+        assertTrue(multiThread.containsCompositeThreadCount(input, 4));
     }
 
     @Test
@@ -31,7 +33,7 @@ public class FinderTest {
         assertFalse(parallelStream.containsComposite(input));
 
         MultiThreadFinder multiThread = new MultiThreadFinder();
-        assertFalse(multiThread.containsComposite(input, 4));
+        assertFalse(multiThread.containsComposite(input));
     }
 }
 

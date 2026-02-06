@@ -28,7 +28,7 @@ public class Main {
         int[] threadCounts = {2, 4, 8, 12, 16, 22};
         for (int t : threadCounts) {
             start = System.nanoTime();
-            boolean res2 = multiFn.containsComposite(data, t);
+            boolean res2 = multiFn.containsCompositeThreadCount(data, t);
             end = System.nanoTime();
             System.out.println("MultiThread (" + t + " threads): " + (end - start) / 1_000_000 + " ms, Result: " + res2);
         }
