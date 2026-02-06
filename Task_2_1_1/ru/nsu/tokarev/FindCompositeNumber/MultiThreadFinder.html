@@ -74,9 +74,14 @@ loadScripts(document, 'script');</script>
 <div class="inheritance">ru.nsu.tokarev.FindCompositeNumber.MultiThreadFinder</div>
 </div>
 <section class="class-description" id="class-description">
+<dl class="notes">
+<dt>All Implemented Interfaces:</dt>
+<dd><code><a href="CompositeFinder.html" title="interface in ru.nsu.tokarev.FindCompositeNumber">CompositeFinder</a></code></dd>
+</dl>
 <hr>
 <div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">MultiThreadFinder</span>
-<span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
+<span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>
+implements <a href="CompositeFinder.html" title="interface in ru.nsu.tokarev.FindCompositeNumber">CompositeFinder</a></span></div>
 </section>
 <section class="summary">
 <ul class="summary-list">
@@ -105,9 +110,12 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#containsComposite(int%5B%5D,int)" class="member-name-link">containsComposite</a><wbr>(int[]&nbsp;numbers,
- int&nbsp;numberOfThreads)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#containsComposite(int%5B%5D)" class="member-name-link">containsComposite</a><wbr>(int[]&nbsp;numbers)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#containsCompositeThreadCount(int%5B%5D,int)" class="member-name-link">containsCompositeThreadCount</a><wbr>(int[]&nbsp;numbers,
+ int&nbsp;numberOfThreads)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
 </div>
@@ -140,10 +148,20 @@ loadScripts(document, 'script');</script>
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="containsComposite(int[],int)">
-<h3>containsComposite</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">containsComposite</span><wbr><span class="parameters">(int[]&nbsp;numbers,
+<section class="detail" id="containsCompositeThreadCount(int[],int)">
+<h3>containsCompositeThreadCount</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">containsCompositeThreadCount</span><wbr><span class="parameters">(int[]&nbsp;numbers,
  int&nbsp;numberOfThreads)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="containsComposite(int[])">
+<h3>containsComposite</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">containsComposite</span><wbr><span class="parameters">(int[]&nbsp;numbers)</span></div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="CompositeFinder.html#containsComposite(int%5B%5D)">containsComposite</a></code>&nbsp;in interface&nbsp;<code><a href="CompositeFinder.html" title="interface in ru.nsu.tokarev.FindCompositeNumber">CompositeFinder</a></code></dd>
+</dl>
 </section>
 </li>
 </ul>
