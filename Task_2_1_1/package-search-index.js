@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"ru.nsu.tokarev"},{"l":"ru.nsu.tokarev.FindCompositeNumber"}];updateSearchResults();
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"ru.nsu.tokarev"},{"l":"ru.nsu.tokarev.FindCompositeNumber"},{"l":"ru.nsu.tokarev.MyAtomicInteger"}];updateSearchResults();
