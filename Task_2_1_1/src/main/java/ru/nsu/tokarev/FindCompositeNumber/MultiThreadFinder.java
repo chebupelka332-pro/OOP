@@ -35,7 +35,7 @@ public class MultiThreadFinder implements CompositeFinder {
 
         try {
             for (Thread thread : threads) {
-                if (thread != null) thread.join();
+                thread.join();
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
