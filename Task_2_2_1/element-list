@@ -1,2 +1,6 @@
 ru.nsu.tokarev
 ru.nsu.tokarev.Pizzeria
+ru.nsu.tokarev.Pizzeria.config
+ru.nsu.tokarev.Pizzeria.queue
+ru.nsu.tokarev.Pizzeria.warehouse
+ru.nsu.tokarev.Pizzeria.worker

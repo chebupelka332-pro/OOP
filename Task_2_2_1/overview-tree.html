@@ -51,7 +51,11 @@ loadScripts(document, 'script');</script>
 <span class="package-hierarchy-label">Package Hierarchies:</span>
 <ul class="horizontal">
 <li><a href="ru/nsu/tokarev/package-tree.html">ru.nsu.tokarev</a>, </li>
-<li><a href="ru/nsu/tokarev/Pizzeria/package-tree.html">ru.nsu.tokarev.Pizzeria</a></li>
+<li><a href="ru/nsu/tokarev/Pizzeria/package-tree.html">ru.nsu.tokarev.Pizzeria</a>, </li>
+<li><a href="ru/nsu/tokarev/Pizzeria/config/package-tree.html">ru.nsu.tokarev.Pizzeria.config</a>, </li>
+<li><a href="ru/nsu/tokarev/Pizzeria/queue/package-tree.html">ru.nsu.tokarev.Pizzeria.queue</a>, </li>
+<li><a href="ru/nsu/tokarev/Pizzeria/warehouse/package-tree.html">ru.nsu.tokarev.Pizzeria.warehouse</a>, </li>
+<li><a href="ru/nsu/tokarev/Pizzeria/worker/package-tree.html">ru.nsu.tokarev.Pizzeria.worker</a></li>
 </ul>
 </div>
 <section class="hierarchy">
@@ -59,8 +63,33 @@ loadScripts(document, 'script');</script>
 <ul>
 <li class="circle">java.lang.<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" class="type-name-link external-link" title="class or interface in java.lang">Object</a>
 <ul>
+<li class="circle">ru.nsu.tokarev.Pizzeria.worker.<a href="ru/nsu/tokarev/Pizzeria/worker/Baker.html" class="type-name-link" title="class in ru.nsu.tokarev.Pizzeria.worker">Baker</a> (implements ru.nsu.tokarev.Pizzeria.worker.<a href="ru/nsu/tokarev/Pizzeria/worker/IWorker.html" title="interface in ru.nsu.tokarev.Pizzeria.worker">IWorker</a>)</li>
+<li class="circle">ru.nsu.tokarev.Pizzeria.worker.<a href="ru/nsu/tokarev/Pizzeria/worker/Courier.html" class="type-name-link" title="class in ru.nsu.tokarev.Pizzeria.worker">Courier</a> (implements ru.nsu.tokarev.Pizzeria.worker.<a href="ru/nsu/tokarev/Pizzeria/worker/IWorker.html" title="interface in ru.nsu.tokarev.Pizzeria.worker">IWorker</a>)</li>
+<li class="circle">ru.nsu.tokarev.Pizzeria.worker.<a href="ru/nsu/tokarev/Pizzeria/worker/DefaultWorkerFactory.html" class="type-name-link" title="class in ru.nsu.tokarev.Pizzeria.worker">DefaultWorkerFactory</a> (implements ru.nsu.tokarev.Pizzeria.worker.<a href="ru/nsu/tokarev/Pizzeria/worker/IWorkerFactory.html" title="interface in ru.nsu.tokarev.Pizzeria.worker">IWorkerFactory</a>)</li>
 <li class="circle">ru.nsu.tokarev.<a href="ru/nsu/tokarev/Main.html" class="type-name-link" title="class in ru.nsu.tokarev">Main</a></li>
+<li class="circle">ru.nsu.tokarev.Pizzeria.queue.<a href="ru/nsu/tokarev/Pizzeria/queue/Order.html" class="type-name-link" title="class in ru.nsu.tokarev.Pizzeria.queue">Order</a></li>
+<li class="circle">ru.nsu.tokarev.Pizzeria.queue.<a href="ru/nsu/tokarev/Pizzeria/queue/OrderQueue.html" class="type-name-link" title="class in ru.nsu.tokarev.Pizzeria.queue">OrderQueue</a></li>
 <li class="circle">ru.nsu.tokarev.Pizzeria.<a href="ru/nsu/tokarev/Pizzeria/Pizzeria.html" class="type-name-link" title="class in ru.nsu.tokarev.Pizzeria">Pizzeria</a></li>
+<li class="circle">ru.nsu.tokarev.Pizzeria.config.<a href="ru/nsu/tokarev/Pizzeria/config/PizzeriaConfig.html" class="type-name-link" title="class in ru.nsu.tokarev.Pizzeria.config">PizzeriaConfig</a></li>
+<li class="circle">ru.nsu.tokarev.Pizzeria.<a href="ru/nsu/tokarev/Pizzeria/PizzeriaConfig.html" class="type-name-link" title="class in ru.nsu.tokarev.Pizzeria">PizzeriaConfig</a></li>
+<li class="circle">ru.nsu.tokarev.Pizzeria.config.<a href="ru/nsu/tokarev/Pizzeria/config/PizzeriaConfig.BakerConfig.html" class="type-name-link" title="class in ru.nsu.tokarev.Pizzeria.config">PizzeriaConfig.BakerConfig</a></li>
+<li class="circle">ru.nsu.tokarev.Pizzeria.<a href="ru/nsu/tokarev/Pizzeria/PizzeriaConfig.BakerConfig.html" class="type-name-link" title="class in ru.nsu.tokarev.Pizzeria">PizzeriaConfig.BakerConfig</a></li>
+<li class="circle">ru.nsu.tokarev.Pizzeria.config.<a href="ru/nsu/tokarev/Pizzeria/config/PizzeriaConfig.CourierConfig.html" class="type-name-link" title="class in ru.nsu.tokarev.Pizzeria.config">PizzeriaConfig.CourierConfig</a></li>
+<li class="circle">ru.nsu.tokarev.Pizzeria.<a href="ru/nsu/tokarev/Pizzeria/PizzeriaConfig.CourierConfig.html" class="type-name-link" title="class in ru.nsu.tokarev.Pizzeria">PizzeriaConfig.CourierConfig</a></li>
+<li class="circle">ru.nsu.tokarev.Pizzeria.warehouse.<a href="ru/nsu/tokarev/Pizzeria/warehouse/Warehouse.html" class="type-name-link" title="class in ru.nsu.tokarev.Pizzeria.warehouse">Warehouse</a> (implements ru.nsu.tokarev.Pizzeria.warehouse.<a href="ru/nsu/tokarev/Pizzeria/warehouse/IWarehouse.html" title="interface in ru.nsu.tokarev.Pizzeria.warehouse">IWarehouse</a>)</li>
+</ul>
+</li>
+</ul>
+</section>
+<section class="hierarchy">
+<h2 title="Interface Hierarchy">Interface Hierarchy</h2>
+<ul>
+<li class="circle">ru.nsu.tokarev.Pizzeria.config.<a href="ru/nsu/tokarev/Pizzeria/config/IConfigLoader.html" class="type-name-link" title="interface in ru.nsu.tokarev.Pizzeria.config">IConfigLoader</a></li>
+<li class="circle">ru.nsu.tokarev.Pizzeria.warehouse.<a href="ru/nsu/tokarev/Pizzeria/warehouse/IWarehouse.html" class="type-name-link" title="interface in ru.nsu.tokarev.Pizzeria.warehouse">IWarehouse</a></li>
+<li class="circle">ru.nsu.tokarev.Pizzeria.worker.<a href="ru/nsu/tokarev/Pizzeria/worker/IWorkerFactory.html" class="type-name-link" title="interface in ru.nsu.tokarev.Pizzeria.worker">IWorkerFactory</a></li>
+<li class="circle">java.lang.<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Runnable.html" class="type-name-link external-link" title="class or interface in java.lang">Runnable</a>
+<ul>
+<li class="circle">ru.nsu.tokarev.Pizzeria.worker.<a href="ru/nsu/tokarev/Pizzeria/worker/IWorker.html" class="type-name-link" title="interface in ru.nsu.tokarev.Pizzeria.worker">IWorker</a></li>
 </ul>
 </li>
 </ul>
@@ -72,7 +101,7 @@ loadScripts(document, 'script');</script>
 <ul>
 <li class="circle">java.lang.<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Enum.html" class="type-name-link external-link" title="class or interface in java.lang">Enum</a>&lt;E&gt; (implements java.lang.<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Comparable.html" title="class or interface in java.lang" class="external-link">Comparable</a>&lt;T&gt;, java.lang.constant.<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/constant/Constable.html" title="class or interface in java.lang.constant" class="external-link">Constable</a>, java.io.<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a>)
 <ul>
-<li class="circle">ru.nsu.tokarev.Pizzeria.<a href="ru/nsu/tokarev/Pizzeria/OrderState.html" class="type-name-link" title="enum class in ru.nsu.tokarev.Pizzeria">OrderState</a></li>
+<li class="circle">ru.nsu.tokarev.Pizzeria.queue.<a href="ru/nsu/tokarev/Pizzeria/queue/OrderState.html" class="type-name-link" title="enum class in ru.nsu.tokarev.Pizzeria.queue">OrderState</a></li>
 </ul>
 </li>
 </ul>

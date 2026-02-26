@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"ru.nsu.tokarev"},{"l":"ru.nsu.tokarev.Pizzeria"}];updateSearchResults();
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"ru.nsu.tokarev"},{"l":"ru.nsu.tokarev.Pizzeria"},{"l":"ru.nsu.tokarev.Pizzeria.config"},{"l":"ru.nsu.tokarev.Pizzeria.queue"},{"l":"ru.nsu.tokarev.Pizzeria.warehouse"},{"l":"ru.nsu.tokarev.Pizzeria.worker"}];updateSearchResults();
