@@ -1,6 +1,10 @@
 package ru.nsu.tokarev.Pizzeria;
 
 import org.junit.jupiter.api.Test;
+import ru.nsu.tokarev.Pizzeria.config.IConfigLoader;
+import ru.nsu.tokarev.Pizzeria.queue.Order;
+import ru.nsu.tokarev.Pizzeria.queue.OrderQueue;
+import ru.nsu.tokarev.Pizzeria.warehouse.Warehouse;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -13,7 +17,7 @@ class PizzeriaTest {
 
     @Test
     void testConfigLoaderThrowsForMissingResource() {
-        ConfigLoader loader = new ConfigLoader();
+        IConfigLoader loader = IConfigLoader.createDefault();
         assertThrows(java.io.IOException.class, () -> loader.load("nonexistent.json"));
     }
 

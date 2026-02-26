@@ -1,13 +1,18 @@
-package ru.nsu.tokarev.Pizzeria;
+package ru.nsu.tokarev.Pizzeria.worker;
+
+import ru.nsu.tokarev.Pizzeria.queue.Order;
+import ru.nsu.tokarev.Pizzeria.queue.OrderQueue;
+import ru.nsu.tokarev.Pizzeria.queue.OrderState;
+import ru.nsu.tokarev.Pizzeria.warehouse.IWarehouse;
 
 
-class Baker implements IWorker {
+public class Baker implements IWorker {
     private final int id;
     private final int bakingTime;
     private final OrderQueue orderQueue;
-    private final Warehouse warehouse;
+    private final IWarehouse warehouse;
 
-    Baker(int id, int bakingTime, OrderQueue orderQueue, Warehouse warehouse) {
+    Baker(int id, int bakingTime, OrderQueue orderQueue, IWarehouse warehouse) {
         this.id = id;
         this.bakingTime = bakingTime;
         this.orderQueue = orderQueue;
@@ -17,6 +22,11 @@ class Baker implements IWorker {
     @Override
     public int getId() {
         return id;
+    }
+
+    @Override
+    public String toString() {
+        return "Baker #" + id;
     }
 
     @Override
@@ -30,16 +40,16 @@ class Baker implements IWorker {
                     break;
                 }
                 order.setState(OrderState.BAKING);
-                System.out.println("  Baker #" + id + " is baking order [" + order.getId() + "]");
+                System.out.println(this + " is baking order [" + order.getId() + "]");
 
                 Thread.sleep(bakingTime);
 
-                System.out.println("  Baker #" + id + " finished order [" + order.getId() + "], moving to warehouse");
+                System.out.println(this + " finished order [" + order.getId() + "], moving to warehouse");
                 warehouse.put(order);
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        System.out.println("  Baker #" + id + " stopped.");
+        System.out.println(this + " stopped.");
     }
 }

@@ -1,5 +1,14 @@
 package ru.nsu.tokarev.Pizzeria;
 
+import ru.nsu.tokarev.Pizzeria.config.IConfigLoader;
+import ru.nsu.tokarev.Pizzeria.queue.Order;
+import ru.nsu.tokarev.Pizzeria.queue.OrderQueue;
+import ru.nsu.tokarev.Pizzeria.warehouse.IWarehouse;
+import ru.nsu.tokarev.Pizzeria.warehouse.Warehouse;
+import ru.nsu.tokarev.Pizzeria.worker.DefaultWorkerFactory;
+import ru.nsu.tokarev.Pizzeria.worker.IWorker;
+import ru.nsu.tokarev.Pizzeria.worker.IWorkerFactory;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +18,7 @@ public class Pizzeria {
 
     private final PizzeriaConfig config;
     private final OrderQueue orderQueue;
-    private final Warehouse warehouse;
+    private final IWarehouse warehouse;
     private final IWorkerFactory workerFactory;
     private final List<Thread> bakerThreads = new ArrayList<>();
     private final List<Thread> courierThreads = new ArrayList<>();
@@ -22,7 +31,7 @@ public class Pizzeria {
     }
 
     public Pizzeria(String configResource) throws IOException {
-        this(new ConfigLoader(), new DefaultWorkerFactory(), configResource);
+        this(IConfigLoader.createDefault(), new DefaultWorkerFactory(), configResource);
     }
 
     public void start() throws InterruptedException {

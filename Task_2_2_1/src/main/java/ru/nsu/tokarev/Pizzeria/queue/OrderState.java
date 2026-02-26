@@ -1,4 +1,4 @@
-package ru.nsu.tokarev.Pizzeria;
+package ru.nsu.tokarev.Pizzeria.queue;
 
 
 public enum OrderState {

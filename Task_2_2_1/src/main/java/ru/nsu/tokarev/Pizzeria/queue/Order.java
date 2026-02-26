@@ -1,29 +1,29 @@
-package ru.nsu.tokarev.Pizzeria;
+package ru.nsu.tokarev.Pizzeria.queue;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
 
-class Order {
+public class Order {
     private static final AtomicInteger counter = new AtomicInteger(1);
 
     private final int id;
     private volatile OrderState state;
 
-    Order() {
+    public Order() {
         this.id = counter.getAndIncrement();
         this.state = OrderState.WAITING;
         printState();
     }
 
-    int getId() {
+    public int getId() {
         return id;
     }
 
-    OrderState getState() {
+    public OrderState getState() {
         return state;
     }
 
-    void setState(OrderState state) {
+    public void setState(OrderState state) {
         this.state = state;
         printState();
     }

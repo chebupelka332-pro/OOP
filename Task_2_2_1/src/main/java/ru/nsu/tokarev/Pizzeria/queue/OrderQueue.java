@@ -1,39 +1,39 @@
-package ru.nsu.tokarev.Pizzeria;
+package ru.nsu.tokarev.Pizzeria.queue;
 
 import java.util.LinkedList;
 import java.util.Queue;
 
 
-class OrderQueue {
+public class OrderQueue {
     private final Queue<Order> queue = new LinkedList<>();
     private boolean closed = false;
 
-    synchronized void put(Order order) {
+    public synchronized void put(Order order) {
         queue.add(order);
         notifyAll();
     }
 
-    synchronized Order take() throws InterruptedException {
+    public synchronized Order take() throws InterruptedException {
         while (queue.isEmpty() && !closed) {
             wait();
         }
         return queue.poll();
     }
 
-    synchronized void close() {
+    public synchronized void close() {
         closed = true;
         notifyAll();
     }
 
-    synchronized boolean isClosed() {
+    public synchronized boolean isClosed() {
         return closed;
     }
 
-    synchronized boolean isEmpty() {
+    public synchronized boolean isEmpty() {
         return queue.isEmpty();
     }
 
-    synchronized int size() {
+    public synchronized int size() {
         return queue.size();
     }
 }

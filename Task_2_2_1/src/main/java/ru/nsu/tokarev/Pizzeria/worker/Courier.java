@@ -1,15 +1,19 @@
-package ru.nsu.tokarev.Pizzeria;
+package ru.nsu.tokarev.Pizzeria.worker;
+
+import ru.nsu.tokarev.Pizzeria.queue.Order;
+import ru.nsu.tokarev.Pizzeria.queue.OrderState;
+import ru.nsu.tokarev.Pizzeria.warehouse.IWarehouse;
 
 import java.util.List;
 
 
-class Courier implements IWorker {
+public class Courier implements IWorker {
     private final int id;
-    private final int trunkSize; // Maximum number of pizzas this courier can carry at once
+    private final int trunkSize;
     private final int deliveryTime;
-    private final Warehouse warehouse;
+    private final IWarehouse warehouse;
 
-    Courier(int id, int trunkSize, int deliveryTime, Warehouse warehouse) {
+    Courier(int id, int trunkSize, int deliveryTime, IWarehouse warehouse) {
         this.id = id;
         this.trunkSize = trunkSize;
         this.deliveryTime = deliveryTime;
@@ -19,6 +23,11 @@ class Courier implements IWorker {
     @Override
     public int getId() {
         return id;
+    }
+
+    @Override
+    public String toString() {
+        return "Courier #" + id;
     }
 
     @Override
@@ -34,19 +43,19 @@ class Courier implements IWorker {
                 for (Order order : batch) {
                     order.setState(OrderState.DELIVERING);
                 }
-                System.out.println("  Courier #" + id + " delivering orders: " + batchIds(batch));
+                System.out.println(this + " delivering orders: " + batchIds(batch));
 
                 Thread.sleep(deliveryTime);
 
                 for (Order order : batch) {
                     order.setState(OrderState.DELIVERED);
                 }
-                System.out.println("  Courier #" + id + " delivered orders: " + batchIds(batch));
+                System.out.println(this + " delivered orders: " + batchIds(batch));
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        System.out.println("  Courier #" + id + " stopped.");
+        System.out.println(this + " stopped.");
     }
 
     private String batchIds(List<Order> batch) {

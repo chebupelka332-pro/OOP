@@ -1,4 +1,4 @@
-package ru.nsu.tokarev.Pizzeria;
+package ru.nsu.tokarev.Pizzeria.config;
 
 import java.util.List;
 

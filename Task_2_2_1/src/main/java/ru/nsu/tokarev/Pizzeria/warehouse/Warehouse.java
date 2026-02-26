@@ -1,4 +1,7 @@
-package ru.nsu.tokarev.Pizzeria;
+package ru.nsu.tokarev.Pizzeria.warehouse;
+
+import ru.nsu.tokarev.Pizzeria.queue.Order;
+import ru.nsu.tokarev.Pizzeria.queue.OrderState;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -6,16 +9,17 @@ import java.util.List;
 import java.util.ArrayList;
 
 
-class Warehouse {
+public class Warehouse implements IWarehouse {
     private final Queue<Order> storage = new LinkedList<>();
     private final int capacity;
     private boolean closed = false;
 
-    Warehouse(int capacity) {
+    public Warehouse(int capacity) {
         this.capacity = capacity;
     }
 
-    synchronized void put(Order order) throws InterruptedException {
+    @Override
+    public synchronized void put(Order order) throws InterruptedException {
         while (storage.size() >= capacity) {
             wait();
         }
@@ -24,7 +28,8 @@ class Warehouse {
         notifyAll();
     }
 
-    synchronized List<Order> take(int maxCount) throws InterruptedException {
+    @Override
+    public synchronized List<Order> take(int maxCount) throws InterruptedException {
         while (storage.isEmpty() && !closed) {
             wait();
         }
@@ -37,20 +42,24 @@ class Warehouse {
         return batch;
     }
 
-    synchronized void close() {
+    @Override
+    public synchronized void close() {
         closed = true;
         notifyAll();
     }
 
-    synchronized boolean isClosed() {
+    @Override
+    public synchronized boolean isClosed() {
         return closed;
     }
 
-    synchronized boolean isEmpty() {
+    @Override
+    public synchronized boolean isEmpty() {
         return storage.isEmpty();
     }
 
-    synchronized int size() {
+    @Override
+    public synchronized int size() {
         return storage.size();
     }
 }

@@ -1,6 +1,7 @@
-package ru.nsu.tokarev.Pizzeria;
+package ru.nsu.tokarev.Pizzeria.config;
 
 import com.google.gson.Gson;
+import ru.nsu.tokarev.Pizzeria.PizzeriaConfig;
 
 import java.io.IOException;
 import java.io.InputStream;
