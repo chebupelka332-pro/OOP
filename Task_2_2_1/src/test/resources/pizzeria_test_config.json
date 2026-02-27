@@ -1,0 +1,13 @@
+{
+  "workingTimeMs": 3000,
+  "warehouseCapacity": 3,
+  "orderIntervalMs": 500,
+  "bakers": [
+    { "id": 1, "bakingTimeMs": 800 },
+    { "id": 2, "bakingTimeMs": 600 }
+  ],
+  "couriers": [
+    { "id": 1, "trunkSize": 2, "deliveryTimeMs": 1000 }
+  ]
+}
+
