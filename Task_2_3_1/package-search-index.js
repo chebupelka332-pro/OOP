@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"m":"ru.nsu.tokarev.snake","l":"ru.nsu.tokarev.snake"},{"m":"ru.nsu.tokarev.snake","l":"ru.nsu.tokarev.snake.model"},{"m":"ru.nsu.tokarev.snake","l":"ru.nsu.tokarev.snake.view"}];updateSearchResults();
