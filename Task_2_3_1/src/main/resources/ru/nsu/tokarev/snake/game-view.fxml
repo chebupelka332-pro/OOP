@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.canvas.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1"
+            xmlns="http://javafx.com/javafx/17.0.12"
+            fx:controller="ru.nsu.tokarev.snake.GameController"
+            fx:id="root"
+            style="-fx-background-color: #1a1a2e;"
+            onKeyPressed="#handleKeyPress">
+
+    <top>
+        <HBox style="-fx-background-color: #16213e; -fx-padding: 8 16 8 16; -fx-spacing: 20;"
+              alignment="CENTER_LEFT">
+            <Label text="🐍 SNAKE" style="-fx-text-fill: #00d4aa; -fx-font-size: 20px; -fx-font-weight: bold;"/>
+            <Label fx:id="lengthLabel" text="Длина: 3"
+                   style="-fx-text-fill: #f5a623; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+        </HBox>
+    </top>
+
+    <center>
+        <Canvas fx:id="gameCanvas"/>
+    </center>
+
+    <bottom>
+        <Label fx:id="statusLabel"
+               text=""
+               style="-fx-text-fill: #aaaaaa; -fx-font-size: 13px; -fx-padding: 6 16 6 16; -fx-background-color: #16213e;"
+               maxWidth="Infinity"/>
+    </bottom>
+
+</BorderPane>
