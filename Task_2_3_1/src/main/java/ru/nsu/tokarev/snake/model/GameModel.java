@@ -73,11 +73,12 @@ public class GameModel {
         snake.move(cols, rows);
 
         if (eating) {
-            if (winCondition.isMet(this)) {
-                state = State.WON;
-                return false;
-            }
             refillFood();
+        }
+
+        if (winCondition.isMet(this)) {
+            state = State.WON;
+            return false;
         }
 
         return true;
@@ -90,6 +91,7 @@ public class GameModel {
     private void placeObstacles(int count) {
         for (int i = 0; i < count; i++) {
             List<Point> emptyCells = getEmptyCells();
+
             // Keep a clear zone around snake start
             emptyCells.removeIf(p -> Math.abs(p.x - cols / 2) <= 5 && Math.abs(p.y - rows / 2) <= 5);
             

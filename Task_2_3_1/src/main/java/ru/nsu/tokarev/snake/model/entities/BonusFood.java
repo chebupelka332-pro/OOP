@@ -21,13 +21,13 @@ public class BonusFood implements Food {
 
     @Override
     public void applyEffect(GameModel model, Snake snake) {
-        snake.addGrowth(3); // Бонус дает сразу 3 сегмента
+        snake.addGrowth(3);
     }
 
     @Override
     public void render(GraphicsContext gc, int cellSize) {
         gc.setFill(COLOR);
-        double margin = cellSize * 0.15; // Чуть больше визуально
+        double margin = cellSize * 0.15;
         double size = cellSize - 2 * margin;
         gc.fillOval(position.x * cellSize + margin, position.y * cellSize + margin, size, size);
     }

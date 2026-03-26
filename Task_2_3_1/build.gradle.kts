@@ -59,6 +59,9 @@ tasks.jacocoTestReport {
         files(classDirectories.files.map {
             fileTree(it) {
                 exclude("ru/nsu/tokarev/snake/Launcher.class")
+                exclude("ru/nsu/tokarev/snake/Application.class")
+                exclude("ru/nsu/tokarev/snake/GameController*.class")
+                exclude("ru/nsu/tokarev/snake/view/GameRenderer.class")
             }
         })
     )

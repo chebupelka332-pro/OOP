@@ -17,11 +17,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class GameRenderer {
-    private static final Color BG_COLOR        = Color.web("#1a1a2e");
-    private static final Color GRID_COLOR      = Color.web("#16213e").deriveColor(0, 1, 1, 0.4);
-    private static final Color HEAD_COLOR      = Color.web("#00d4aa");
-    private static final Color BODY_COLOR      = Color.web("#0f9b8e");
-    private static final Color TAIL_COLOR      = Color.web("#0a6b60");
+    private static final Color BG_COLOR   = Color.web("#1a1a2e");
+    private static final Color GRID_COLOR = Color.web("#16213e").deriveColor(0, 1, 1, 0.4);
+    private static final Color HEAD_COLOR = Color.web("#00d4aa");
+    private static final Color BODY_COLOR = Color.web("#0f9b8e");
+    private static final Color TAIL_COLOR = Color.web("#0a6b60");
 
     private final Canvas canvas;
     private final int cellSize;
@@ -56,7 +56,6 @@ public class GameRenderer {
             drawGrid(gc, cols, rows);
             firstRender = false;
         } else {
-            // Determine cells to clear: cells occupied previously but not anymore
             Set<Point> cellsToClear = new HashSet<>();
             
             for (Point p : lastSnakeBody) {
@@ -69,7 +68,6 @@ public class GameRenderer {
                 if (!currentObstaclesPositions.contains(p)) cellsToClear.add(p);
             }
 
-            // Always clear old and new head to redraw eyes properly
             if (!lastSnakeBody.isEmpty()) cellsToClear.add(lastSnakeBody.get(0));
             if (!currentBody.isEmpty()) cellsToClear.add(currentBody.get(0));
 
@@ -84,8 +82,6 @@ public class GameRenderer {
                 gc.strokeLine(p.x * cellSize, p.y * cellSize, p.x * cellSize, (p.y + 1) * cellSize); // Left
             }
         }
-
-        // Redraw only what's needed. For simplicity of delta, just redraw all active entities over their cells since we cleared trailing tails
         
         for (Obstacle obs : currentObstacles) {
             if (firstRender || !lastObstaclesPositions.contains(obs.getPosition())) {
@@ -101,7 +97,7 @@ public class GameRenderer {
 
         for (int i = 0; i < currentBody.size(); i++) {
             Point p = currentBody.get(i);
-            // Re-draw if it's new, it's the head (with eyes), or we just cleared it
+            // Redraw if it's new, it's the head or we just cleared it
             Color color;
             if (i == 0) {
                 color = HEAD_COLOR;
@@ -111,11 +107,10 @@ public class GameRenderer {
                 double t = (double) i / (currentBody.size() - 1);
                 color = BODY_COLOR.interpolate(TAIL_COLOR, t);
             }
-            // To ensure smooth shading update without missing cells, just redraw the body.
-            // Since it only redraws small rects, the main cost was BG filling the whole screen.
+            
             gc.setFill(color);
             int margin = (i == 0) ? 0 : 1;
-            // First clear it lightly to prevent artifacts from overdrawing with gradients
+            
             gc.clearRect(p.x * cellSize, p.y * cellSize, cellSize, cellSize);
             gc.setFill(BG_COLOR);
             gc.fillRect(p.x * cellSize, p.y * cellSize, cellSize, cellSize);
@@ -131,7 +126,6 @@ public class GameRenderer {
             drawEyes(gc, currentBody.get(0), snake.getDirection());
         }
 
-        // Update cache
         lastObstaclesPositions.clear(); lastObstaclesPositions.addAll(currentObstaclesPositions);
         lastFoodPositions.clear(); lastFoodPositions.addAll(currentFoodPositions);
         lastSnakeBody.clear(); lastSnakeBody.addAll(currentBody);

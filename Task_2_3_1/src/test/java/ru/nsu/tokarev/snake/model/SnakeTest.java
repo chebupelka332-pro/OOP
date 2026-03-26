@@ -35,7 +35,7 @@ class SnakeTest {
         assertEquals(3, snake.getLength());
 
         Point headAfter = snake.getHead();
-        assertEquals(headBefore.x + 1, headAfter.x); // Should move RIGHT initially
+        assertEquals(headBefore.x + 1, headAfter.x);
         assertEquals(headBefore.y, headAfter.y);
     }
 
@@ -44,7 +44,6 @@ class SnakeTest {
         snake.addGrowth(1);
         snake.move(COLS, ROWS);
         assertEquals(4, snake.getLength());
-        // Body should include new head and keep tail
     }
 
     @Test
@@ -53,21 +52,17 @@ class SnakeTest {
         assertEquals(Direction.DOWN, snake.getDirection());
 
         snake.addGrowth(1);
-        snake.move(COLS, ROWS); // Move down, locks in the DOWN move
+        snake.move(COLS, ROWS);
 
-        // Attempting to reverse immediately should be ignored
         snake.setDirection(Direction.UP);
-        assertEquals(Direction.DOWN, snake.getDirection()); // Remains down
+        assertEquals(Direction.DOWN, snake.getDirection());
     }
 
     @Test
     void testDoubleSetDirection() {
         snake.setDirection(Direction.UP);
         snake.setDirection(Direction.LEFT);
-        // It should drop LEFT and keep UP, since UP hasn't been moved yet
-        // However my implementation respects `lastMovedDirection`, which is RIGHT
-        // Setting UP is valid, setting LEFT is valid (LEFT is opposite of RIGHT, so it will ignore left)
-        assertEquals(Direction.UP, snake.getDirection()); // LEFT is ignored as it is opposite to lastMovedDirection
+        assertEquals(Direction.UP, snake.getDirection());
     }
 
     @Test
@@ -81,12 +76,12 @@ class SnakeTest {
     void testWrapLeft() {
         Snake s = new Snake(3, 25);
         s.setDirection(Direction.UP);
-        s.move(COLS, ROWS); // now safe to go UP
+        s.move(COLS, ROWS);
 
         s.setDirection(Direction.LEFT);
         while (s.getHead().x > 0) s.move(COLS, ROWS);
         // currently at x=0
-        s.move(COLS, ROWS); // cross the left border
+        s.move(COLS, ROWS);
         assertEquals(49, s.getHead().x, "Should wrap around to x=COLS-1");
     }
 

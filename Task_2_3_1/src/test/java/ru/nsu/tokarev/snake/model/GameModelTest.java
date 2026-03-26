@@ -54,7 +54,6 @@ class GameModelTest {
 
     @Test
     void testEatingFoodGrowsSnake() {
-        // Manually steer snake towards a food cell
         Snake snake = model.getSnake();
         Point food = model.getFoods().iterator().next().getPosition();
         Point head = snake.getHead();
