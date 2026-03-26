@@ -3,9 +3,15 @@ package ru.nsu.tokarev.snake.model.entities;
 import org.junit.jupiter.api.Test;
 import ru.nsu.tokarev.snake.model.Point;
 import ru.nsu.tokarev.snake.model.Snake;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class EntitiesTest {
+
+    private final Canvas canvas = new Canvas(100, 100);
+    private final GraphicsContext gc = canvas.getGraphicsContext2D();
 
     @Test
     void testBasicFood() {
@@ -17,6 +23,9 @@ class EntitiesTest {
         food.applyEffect(null, s);
         s.move(20, 20);
         assertEquals(4, s.getLength());
+        
+        // test render coverage
+        assertDoesNotThrow(() -> food.render(gc, 20));
     }
 
     @Test
@@ -32,6 +41,8 @@ class EntitiesTest {
         s.move(20, 20);
         s.move(20, 20);
         assertEquals(6, s.getLength());
+
+        assertDoesNotThrow(() -> food.render(gc, 20));
     }
 
     @Test
@@ -47,6 +58,9 @@ class EntitiesTest {
         // try shrink below 2
         food.applyEffect(null, s);
         assertEquals(2, s.getLength());
+        
+        // test render coverage
+        assertDoesNotThrow(() -> food.render(gc, 20));
     }
 
     @Test
@@ -54,5 +68,8 @@ class EntitiesTest {
         Point p = new Point(4, 4);
         BasicObstacle obstacle = new BasicObstacle(p);
         assertEquals(p, obstacle.getPosition());
+        
+        // test render coverage
+        assertDoesNotThrow(() -> obstacle.render(gc, 20));
     }
 }

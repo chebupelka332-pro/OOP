@@ -55,13 +55,18 @@ class GameModelTest {
     @Test
     void testEatingFoodGrowsSnake() {
         Snake snake = model.getSnake();
-        Point food = model.getFoods().iterator().next().getPosition();
+        ru.nsu.tokarev.snake.model.entities.Food foodEntity = model.getFoods().iterator().next();
+        Point food = foodEntity.getPosition();
         Point head = snake.getHead();
 
         int lengthBefore = snake.getLength();
         driveSnakeToPoint(model, head, food);
 
-        assertTrue(model.getSnake().getLength() > lengthBefore);
+        if (foodEntity instanceof ru.nsu.tokarev.snake.model.entities.PoisonFood) {
+            assertTrue(model.getSnake().getLength() < lengthBefore);
+        } else {
+            assertTrue(model.getSnake().getLength() > lengthBefore);
+        }
     }
 
     @Test
