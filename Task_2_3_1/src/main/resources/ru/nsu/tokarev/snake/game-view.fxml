@@ -16,6 +16,7 @@
         <HBox style="-fx-background-color: #16213e; -fx-padding: 8 16 8 16; -fx-spacing: 20;"
               alignment="CENTER_LEFT">
             <Label text="🐍 SNAKE" style="-fx-text-fill: #00d4aa; -fx-font-size: 20px; -fx-font-weight: bold;"/>
+            <Label fx:id="levelLabel" text="Уровень: 1" style="-fx-text-fill: #e0e0e0; -fx-font-size: 16px; -fx-font-weight: bold;"/>
             <Label fx:id="lengthLabel" text="Длина: 3"
                    style="-fx-text-fill: #f5a623; -fx-font-size: 16px; -fx-font-weight: bold;"/>
         </HBox>

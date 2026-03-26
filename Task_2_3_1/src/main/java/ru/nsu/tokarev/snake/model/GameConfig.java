@@ -1,11 +1,37 @@
 package ru.nsu.tokarev.snake.model;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Getter;
+import lombok.Setter;
+import java.io.InputStream;
+import java.util.List;
+import java.util.ArrayList;
+
+@Getter
+@Setter
 public class GameConfig {
-    public static final int COLS = 25;
-    public static final int ROWS = 25;
-    public static final int CELL_SIZE = 30;
-    public static final int MAX_FOOD_COUNT = 3;
-    public static final int OBSTACLE_COUNT = 20;
-    public static final int GAME_SPEED_MS = 140;
+    private int cols;
+    private int rows;
+    private int cellSize;
+
+    private List<LevelConfig> levels;
+
+    public GameConfig() {
+        levels = new ArrayList<>();
+        levels.add(new LevelConfig());
+    }
+
+    public static GameConfig load() {
+        try (InputStream is = GameConfig.class.getResourceAsStream("/config.json")) {
+            if (is != null) {
+                ObjectMapper mapper = new ObjectMapper();
+                return mapper.readValue(is, GameConfig.class);
+            }
+        } catch (Exception e) {
+            System.err.println("Could not load config.json, using defaults.");
+            e.printStackTrace();
+        }
+        return new GameConfig();
+    }
 }
 

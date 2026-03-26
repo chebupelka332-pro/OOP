@@ -1,0 +1,25 @@
+{
+    "cols": 25,
+    "rows": 25,
+    "cellSize": 30,
+    "levels": [
+        {
+            "maxFoodCount": 3,
+            "obstacleCount": 10,
+            "gameSpeedMs": 150,
+            "winLength": 10
+        },
+        {
+            "maxFoodCount": 4,
+            "obstacleCount": 20,
+            "gameSpeedMs": 120,
+            "winLength": 20
+        },
+        {
+            "maxFoodCount": 5,
+            "obstacleCount": 35,
+            "gameSpeedMs": 90,
+            "winLength": 30
+        }
+    ]
+}

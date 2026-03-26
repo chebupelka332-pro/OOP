@@ -11,12 +11,13 @@ class GameModelTest {
     private static final int ROWS = 50;
     private static final int FOOD_COUNT = 3;
     private static final int OBSTACLE_COUNT = 0;
+    private static final LengthWinCondition WIN_CONDITION = new LengthWinCondition(100);
 
     private GameModel model;
 
     @BeforeEach
     void setUp() {
-        model = new GameModel(COLS, ROWS, FOOD_COUNT, OBSTACLE_COUNT);
+        model = new GameModel(COLS, ROWS, FOOD_COUNT, OBSTACLE_COUNT, WIN_CONDITION);
     }
 
     @Test
@@ -31,7 +32,7 @@ class GameModelTest {
 
     @Test
     void testInitialFoodCount() {
-        assertEquals(FOOD_COUNT, model.getFood().size());
+        assertEquals(FOOD_COUNT, model.getFoods().size());
     }
 
     @Test
@@ -55,7 +56,7 @@ class GameModelTest {
     void testEatingFoodGrowsSnake() {
         // Manually steer snake towards a food cell
         Snake snake = model.getSnake();
-        Point food = model.getFood().iterator().next();
+        Point food = model.getFoods().iterator().next().getPosition();
         Point head = snake.getHead();
 
         int lengthBefore = snake.getLength();
@@ -67,23 +68,24 @@ class GameModelTest {
     @Test
     void testFoodRefillsAfterEating() {
         Snake snake = model.getSnake();
-        Point food = model.getFood().iterator().next();
+        Point food = model.getFoods().iterator().next().getPosition();
         driveSnakeToPoint(model, snake.getHead(), food);
 
-        assertEquals(FOOD_COUNT, model.getFood().size());
+        assertEquals(FOOD_COUNT, model.getFoods().size());
     }
 
     @Test
     void testObstaclesPlaced() {
-        GameModel m = new GameModel(COLS, ROWS, 1, 10);
+        GameModel m = new GameModel(COLS, ROWS, 1, 10, WIN_CONDITION);
         assertEquals(10, m.getObstacles().size());
     }
 
     @Test
     void testObstacleNotOnSnakeStart() {
-        GameModel m = new GameModel(COLS, ROWS, 1, 50);
+        GameModel m = new GameModel(COLS, ROWS, 1, 50, WIN_CONDITION);
         Snake s = m.getSnake();
-        for (Point obs : m.getObstacles()) {
+        for (ru.nsu.tokarev.snake.model.entities.Obstacle obsEntity : m.getObstacles()) {
+            Point obs = obsEntity.getPosition();
             assertFalse(s.contains(obs),
                     "Obstacle must not overlap snake start: " + obs);
         }
@@ -91,9 +93,10 @@ class GameModelTest {
 
     @Test
     void testHittingObstacleCausesGameOver() {
-        GameModel m = new GameModel(COLS, ROWS, 1, 20);
+        GameModel m = new GameModel(COLS, ROWS, 1, 20, WIN_CONDITION);
         Point target = null;
-        for (Point obs : m.getObstacles()) {
+        for (ru.nsu.tokarev.snake.model.entities.Obstacle obsEntity : m.getObstacles()) {
+            Point obs = obsEntity.getPosition();
             target = obs;
             break;
         }
@@ -127,7 +130,7 @@ class GameModelTest {
 
     @Test
     void testSnakeWrapsHorizontally() {
-        GameModel m = new GameModel(COLS, ROWS, 1, 0);
+        GameModel m = new GameModel(COLS, ROWS, 1, 0, WIN_CONDITION);
         Snake s = m.getSnake();
 
         int stepsToEdge = COLS - 1 - s.getHead().x;
@@ -159,18 +162,15 @@ class GameModelTest {
     }
 
     private void forceSelfCollision(GameModel m) {
-        for (int i = 0; i < 10; i++) {
-            Point food = m.getFood().iterator().next();
-            driveSnakeToPoint(m, m.getSnake().getHead(), food);
-            if (m.getState() == GameModel.State.GAME_OVER) return;
-        }
-
+        m.getSnake().addGrowth(10);
+        tickN(m, 10);
+        
         int steps = 0;
         while (m.getState() == GameModel.State.RUNNING && steps++ < 5000) {
-            m.setDirection(Direction.UP);    tickN(m, 3);
-            m.setDirection(Direction.RIGHT); tickN(m, 3);
-            m.setDirection(Direction.DOWN);  tickN(m, 3);
-            m.setDirection(Direction.LEFT);  tickN(m, 3);
+            m.setDirection(Direction.UP);    tickN(m, 1);
+            m.setDirection(Direction.RIGHT); tickN(m, 1);
+            m.setDirection(Direction.DOWN);  tickN(m, 1);
+            m.setDirection(Direction.LEFT);  tickN(m, 1);
         }
     }
 

@@ -3,8 +3,8 @@ plugins {
     application
     jacoco
     id("org.javamodularity.moduleplugin") version "1.8.15"
-    id("org.openjfx.javafxplugin") version "0.0.13"
-    id("org.beryx.jlink") version "2.25.0"
+    id("org.openjfx.javafxplugin") version "0.1.0"
+    id("org.beryx.jlink") version "3.0.1"
 }
 
 group = "ru.nsu.tokarev"
@@ -28,7 +28,7 @@ tasks.withType<JavaCompile> {
 
 application {
     mainModule.set("ru.nsu.tokarev.snake")
-    mainClass.set("ru.nsu.tokarev.snake.HelloApplication")
+    mainClass.set("ru.nsu.tokarev.snake.Launcher")
 }
 
 javafx {
@@ -37,6 +37,12 @@ javafx {
 }
 
 dependencies {
+    compileOnly("org.projectlombok:lombok:1.18.30")
+    annotationProcessor("org.projectlombok:lombok:1.18.30")
+    testCompileOnly("org.projectlombok:lombok:1.18.30")
+    testAnnotationProcessor("org.projectlombok:lombok:1.18.30")
+    
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.16.1")
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testImplementation("org.junit.jupiter:junit-jupiter-params:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
@@ -49,13 +55,17 @@ tasks.jacocoTestReport {
         xml.required.set(true)
         html.required.set(true)
     }
+    classDirectories.setFrom(
+        files(classDirectories.files.map {
+            fileTree(it) {
+                exclude("ru/nsu/tokarev/snake/Launcher.class")
+            }
+        })
+    )
 }
 
 tasks.withType<Test> {
     useJUnitPlatform()
-
-    // Disable JPMS for tests — the modularity plugin supports this flag.
-    // Tests run on the classpath so JUnit can access all packages freely.
     extensions.configure<org.javamodularity.moduleplugin.extensions.TestModuleOptions> {
         runOnClasspath = true
     }
