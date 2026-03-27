@@ -12,6 +12,8 @@ public class GameMessages {
     private String lengthFormat;
     private String gameOver;
     private String gameWon;
+    private String levelLabel;
+    private String levelStart;
 
     public static GameMessages load() {
         try (InputStream is = GameMessages.class.getResourceAsStream("/messages_ru.json")) {

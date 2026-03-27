@@ -59,23 +59,40 @@ public class GameController implements Initializable {
     }
 
     private void startNewGame() {
+        LevelConfig level = getCurrentLevel();
+        if (level == null) return;
+
+        initModelAndRenderer(level);
+        initUI(level);
+        startTimer(level);
+    }
+
+    private LevelConfig getCurrentLevel() {
         if (config.getLevels() == null || config.getLevels().isEmpty()) {
             System.err.println("No levels found in config.");
-            return;
+            return null;
         }
-        LevelConfig level = config.getLevels().get(currentLevelIndex);
+        return config.getLevels().get(currentLevelIndex);
+    }
 
+    private void initModelAndRenderer(LevelConfig level) {
         model = new GameModel(
                 config.getCols(),
                 config.getRows(),
-                level.getMaxFoodCount(),
-                level.getObstacleCount(),
+                level,
                 new ru.nsu.tokarev.snake.model.LengthWinCondition(level.getWinLength())
         );
         renderer = new GameRenderer(gameCanvas, config.getCellSize());
-        levelLabel.setText("Уровень: " + (currentLevelIndex + 1));
-        statusLabel.setText("Уровень " + (currentLevelIndex + 1) + "! " + messages.getControlsHint());
+    }
 
+    private void initUI(LevelConfig level) {
+        levelLabel.setText(String.format(messages.getLevelLabel(), currentLevelIndex + 1));
+        statusLabel.setText(String.format(messages.getLevelStart(), currentLevelIndex + 1, messages.getControlsHint()));
+        renderer.render(model);
+        lengthLabel.setText(String.format(messages.getLengthFormat(), model.getSnake().getLength(), level.getWinLength()));
+    }
+
+    private void startTimer(LevelConfig level) {
         if (timer != null) timer.stop();
         lastTick = 0;
 
@@ -86,30 +103,35 @@ public class GameController implements Initializable {
                 long elapsedMs = (now - lastTick) / 1_000_000;
                 if (elapsedMs >= level.getGameSpeedMs()) {
                     lastTick = now;
-                    boolean alive = model.tick();
-                    renderer.render(model);
-                    lengthLabel.setText(String.format(messages.getLengthFormat(), model.getSnake().getLength(), level.getWinLength()));
-                    if (!alive) {
-                        if (model.getState() == GameModel.State.WON) {
-                            if (currentLevelIndex + 1 < config.getLevels().size()) {
-                                currentLevelIndex++;
-                                startNewGame();
-                            } else {
-                                statusLabel.setText(messages.getGameWon());
-                                timer.stop();
-                            }
-                        } else {
-                            statusLabel.setText(String.format(messages.getGameOver(), model.getSnake().getLength()));
-                            timer.stop();
-                        }
-                    }
+                    handleGameTick(level);
                 }
             }
         };
+        timer.start();
+    }
 
+    private void handleGameTick(LevelConfig level) {
+        boolean alive = model.tick();
         renderer.render(model);
         lengthLabel.setText(String.format(messages.getLengthFormat(), model.getSnake().getLength(), level.getWinLength()));
-        timer.start();
+        if (!alive) {
+            handleGameOver();
+        }
+    }
+
+    private void handleGameOver() {
+        if (model.getState() == GameModel.State.WON) {
+            if (currentLevelIndex + 1 < config.getLevels().size()) {
+                currentLevelIndex++;
+                startNewGame();
+            } else {
+                statusLabel.setText(messages.getGameWon());
+                timer.stop();
+            }
+        } else {
+            statusLabel.setText(String.format(messages.getGameOver(), model.getSnake().getLength()));
+            timer.stop();
+        }
     }
 
     @FXML

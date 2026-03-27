@@ -17,7 +17,7 @@ public class GameModel {
     @Getter
     private final Snake snake;
     private final Map<Point, Food> foods = new HashMap<>();
-    private final EntityGenerator<Food> foodGenerator = new RandomFoodFactory();
+    private final EntityGenerator<Food> foodGenerator;
     private final Map<Point, Obstacle> obstacles = new HashMap<>();
     private final EntityGenerator<Obstacle> obstacleGenerator = new ObstacleGenerator();
     @Getter
@@ -27,54 +27,48 @@ public class GameModel {
     @Getter
     private final WinCondition winCondition;
 
-    public GameModel(int cols, int rows, int maxFoodCount, int obstacleCount, WinCondition winCondition) {
+    public GameModel(int cols, int rows, LevelConfig levelConfig, WinCondition winCondition) {
         this.cols = cols;
         this.rows = rows;
-        this.maxFoodCount = maxFoodCount;
+        this.maxFoodCount = levelConfig.getMaxFoodCount();
         this.winCondition = winCondition;
+        this.foodGenerator = new RandomFoodFactory(
+                levelConfig.getBasicFoodChance(),
+                levelConfig.getBonusFoodChance(),
+                levelConfig.getPoisonFoodChance()
+        );
 
         snake = new Snake(cols / 2, rows / 2);
-        placeObstacles(obstacleCount);
+        placeObstacles(levelConfig.getObstacleCount());
         refillFood();
     }
 
+    public GameModel(int cols, int rows, int maxFoodCount, int obstacleCount, WinCondition winCondition) {
+        this(cols, rows, createTempConfig(maxFoodCount, obstacleCount), winCondition);
+    }
+
+    private static LevelConfig createTempConfig(int maxFoodCount, int obstacleCount) {
+        LevelConfig config = new LevelConfig();
+        config.setMaxFoodCount(maxFoodCount);
+        config.setObstacleCount(obstacleCount);
+        return config;
+    }
+
     public boolean tick() {
-        if (state == State.GAME_OVER || state == State.WON) return false;
+        if (state != State.RUNNING) {
+            return false;
+        }
 
-        Point head = snake.getHead();
-        int nx = head.x + dx(snake.getDirection());
-        int ny = head.y + dy(snake.getDirection());
-        Point next = new Point(nx, ny).wrap(cols, rows);
+        Point nextPosition = calculateNextPosition();
+        Food targetFood = foods.get(nextPosition);
+        boolean isEating = (targetFood != null);
 
-        if (obstacles.containsKey(next)) {
+        if (checkCollision(nextPosition, isEating)) {
             state = State.GAME_OVER;
             return false;
         }
 
-        Food eatingFood = foods.get(next);
-        boolean eating = (eatingFood != null);
-
-        if (!eating && snake.bodyContains(next)) {
-            Point tail = snake.getTail();
-            if (!next.equals(tail)) {
-                state = State.GAME_OVER;
-                return false;
-            }
-        } else if (eating && snake.bodyContains(next)) {
-            state = State.GAME_OVER;
-            return false;
-        }
-
-        if (eating) {
-            eatingFood.applyEffect(this, snake);
-            foods.remove(next);
-        }
-
-        snake.move(cols, rows);
-
-        if (eating) {
-            refillFood();
-        }
+        handleMovement(nextPosition, targetFood);
 
         if (winCondition.isMet(this)) {
             state = State.WON;
@@ -82,6 +76,36 @@ public class GameModel {
         }
 
         return true;
+    }
+
+    private Point calculateNextPosition() {
+        Point head = snake.getHead();
+        int nx = head.x + dx(snake.getDirection());
+        int ny = head.y + dy(snake.getDirection());
+        return new Point(nx, ny).wrap(cols, rows);
+    }
+
+    private boolean checkCollision(Point targetPosition, boolean isEating) {
+        if (obstacles.containsKey(targetPosition)) {
+            return true;
+        }
+        if (snake.bodyContains(targetPosition)) {
+            return isEating || !targetPosition.equals(snake.getTail());
+        }
+        return false;
+    }
+
+    private void handleMovement(Point nextPosition, Food targetFood) {
+        if (targetFood != null) {
+            targetFood.applyEffect(this, snake);
+            foods.remove(nextPosition);
+        }
+
+        snake.move(cols, rows);
+
+        if (targetFood != null) {
+            refillFood();
+        }
     }
 
     public void setDirection(Direction d) {
@@ -126,10 +150,6 @@ public class GameModel {
                 foods.put(newFood.getPosition(), newFood);
             }
         }
-    }
-
-    private Point randomPoint() {
-        return new Point(random.nextInt(cols), random.nextInt(rows));
     }
 
     private static int dx(Direction d) {

@@ -10,4 +10,7 @@ public class LevelConfig {
     private int obstacleCount = 20;
     private int gameSpeedMs = 140;
     private int winLength = 20;
+    private int basicFoodChance = 70;
+    private int bonusFoodChance = 20;
+    private int poisonFoodChance = 10;
 }
