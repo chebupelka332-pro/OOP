@@ -1,0 +1,43 @@
+{
+    "cols": 25,
+    "rows": 25,
+    "cellSize": 30,
+    "levels": [
+        {
+            "maxFoodCount": 3,
+            "obstacleCount": 10,
+            "gameSpeedMs": 150,
+            "winLength": 10,
+            "basicFoodChance": 80,
+            "bonusFoodChance": 20,
+            "poisonFoodChance": 0
+        },
+        {
+            "maxFoodCount": 4,
+            "obstacleCount": 20,
+            "gameSpeedMs": 120,
+            "winLength": 20,
+            "basicFoodChance": 70,
+            "bonusFoodChance": 20,
+            "poisonFoodChance": 10
+        },
+        {
+            "maxFoodCount": 5,
+            "obstacleCount": 35,
+            "gameSpeedMs": 90,
+            "winLength": 30,
+            "basicFoodChance": 60,
+            "bonusFoodChance": 20,
+            "poisonFoodChance": 20
+        },
+        {
+            "maxFoodCount": 6,
+            "obstacleCount": 50,
+            "gameSpeedMs": 60,
+            "winLength": 40,
+            "basicFoodChance": 50,
+            "bonusFoodChance": 10,
+            "poisonFoodChance": 40
+        }
+    ]
+}

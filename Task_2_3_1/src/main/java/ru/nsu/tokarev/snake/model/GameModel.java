@@ -1,0 +1,170 @@
+package ru.nsu.tokarev.snake.model;
+
+import ru.nsu.tokarev.snake.model.entities.*;
+import lombok.Getter;
+import java.util.*;
+
+public class GameModel {
+
+    public enum State { RUNNING, GAME_OVER, WON }
+
+    @Getter
+    private final int cols;
+    @Getter
+    private final int rows;
+    private final int maxFoodCount;
+
+    @Getter
+    private final Snake snake;
+    private final Map<Point, Food> foods = new HashMap<>();
+    private final EntityGenerator<Food> foodGenerator;
+    private final Map<Point, Obstacle> obstacles = new HashMap<>();
+    private final EntityGenerator<Obstacle> obstacleGenerator = new ObstacleGenerator();
+    @Getter
+    private State state = State.RUNNING;
+
+    private final Random random = new Random();
+    @Getter
+    private final WinCondition winCondition;
+
+    public GameModel(int cols, int rows, LevelConfig levelConfig, WinCondition winCondition) {
+        this.cols = cols;
+        this.rows = rows;
+        this.maxFoodCount = levelConfig.getMaxFoodCount();
+        this.winCondition = winCondition;
+        this.foodGenerator = new RandomFoodFactory(
+                levelConfig.getBasicFoodChance(),
+                levelConfig.getBonusFoodChance(),
+                levelConfig.getPoisonFoodChance()
+        );
+
+        snake = new Snake(cols / 2, rows / 2);
+        placeObstacles(levelConfig.getObstacleCount());
+        refillFood();
+    }
+
+    public GameModel(int cols, int rows, int maxFoodCount, int obstacleCount, WinCondition winCondition) {
+        this(cols, rows, createTempConfig(maxFoodCount, obstacleCount), winCondition);
+    }
+
+    private static LevelConfig createTempConfig(int maxFoodCount, int obstacleCount) {
+        LevelConfig config = new LevelConfig();
+        config.setMaxFoodCount(maxFoodCount);
+        config.setObstacleCount(obstacleCount);
+        return config;
+    }
+
+    public boolean tick() {
+        if (state != State.RUNNING) {
+            return false;
+        }
+
+        Point nextPosition = calculateNextPosition();
+        Food targetFood = foods.get(nextPosition);
+        boolean isEating = (targetFood != null);
+
+        if (checkCollision(nextPosition, isEating)) {
+            state = State.GAME_OVER;
+            return false;
+        }
+
+        handleMovement(nextPosition, targetFood);
+
+        if (winCondition.isMet(this)) {
+            state = State.WON;
+            return false;
+        }
+
+        return true;
+    }
+
+    private Point calculateNextPosition() {
+        Point head = snake.getHead();
+        int nx = head.x + dx(snake.getDirection());
+        int ny = head.y + dy(snake.getDirection());
+        return new Point(nx, ny).wrap(cols, rows);
+    }
+
+    private boolean checkCollision(Point targetPosition, boolean isEating) {
+        if (obstacles.containsKey(targetPosition)) {
+            return true;
+        }
+        if (snake.bodyContains(targetPosition)) {
+            return isEating || !targetPosition.equals(snake.getTail());
+        }
+        return false;
+    }
+
+    private void handleMovement(Point nextPosition, Food targetFood) {
+        if (targetFood != null) {
+            targetFood.applyEffect(this, snake);
+            foods.remove(nextPosition);
+        }
+
+        snake.move(cols, rows);
+
+        if (targetFood != null) {
+            refillFood();
+        }
+    }
+
+    public void setDirection(Direction d) {
+        snake.setDirection(d);
+    }
+
+    private void placeObstacles(int count) {
+        for (int i = 0; i < count; i++) {
+            List<Point> emptyCells = getEmptyCells();
+
+            // Keep a clear zone around snake start
+            emptyCells.removeIf(p -> Math.abs(p.x - cols / 2) <= 5 && Math.abs(p.y - rows / 2) <= 5);
+            
+            if (emptyCells.isEmpty()) break;
+            
+            Obstacle obs = obstacleGenerator.generate(emptyCells);
+            if (obs != null) {
+                obstacles.put(obs.getPosition(), obs);
+            }
+        }
+    }
+
+    private List<Point> getEmptyCells() {
+        List<Point> empty = new ArrayList<>();
+        for (int y = 0; y < rows; y++) {
+            for (int x = 0; x < cols; x++) {
+                Point p = new Point(x, y);
+                if (!snake.contains(p) && !obstacles.containsKey(p) && !foods.containsKey(p)) {
+                    empty.add(p);
+                }
+            }
+        }
+        return empty;
+    }
+
+    private void refillFood() {
+        while (foods.size() < maxFoodCount) {
+            List<Point> emptyCells = getEmptyCells();
+            if (emptyCells.isEmpty()) break;
+            Food newFood = foodGenerator.generate(emptyCells);
+            if (newFood != null) {
+                foods.put(newFood.getPosition(), newFood);
+            }
+        }
+    }
+
+    private static int dx(Direction d) {
+        return switch (d) { case LEFT -> -1; case RIGHT -> 1; default -> 0; };
+    }
+
+    private static int dy(Direction d) {
+        return switch (d) { case UP -> -1; case DOWN -> 1; default -> 0; };
+    }
+
+    public Collection<Food> getFoods() {
+        return Collections.unmodifiableCollection(foods.values());
+    }
+
+    public Collection<Obstacle> getObstacles() {
+        return Collections.unmodifiableCollection(obstacles.values());
+    }
+}
