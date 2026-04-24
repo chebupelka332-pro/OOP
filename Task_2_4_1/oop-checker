@@ -1,0 +1,4 @@
+#!/bin/sh
+# Запуск: ./oop-checker test [--config <файл>]
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+exec java -jar "$SCRIPT_DIR/build/libs/oop-checker-1.0-SNAPSHOT.jar" "$@"
