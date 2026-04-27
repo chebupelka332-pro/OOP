@@ -81,8 +81,6 @@ class GradleRunnerTest {
 
     @Test
     void usesGradleCommandWhenNoGradlew() {
-        // directory exists but has no gradlew → falls back to system gradle
-        // we can't assert success (gradle may not be installed), just assert no crash
         def dir = tempDir.toFile()
         def result = GradleRunner.runTask(dir, 5, "--version")
         assertNotNull(result)

@@ -183,7 +183,7 @@ class HtmlReporterTest {
             }}
             check { groups "G"; tasks "t1" }
         """)
-        // empty results map → should not throw
+
         def html = generateWith(config, [:])
         assertTrue(html.contains("S1"))
         assertTrue(html.contains("0/0/0"))
@@ -203,7 +203,6 @@ class HtmlReporterTest {
         def r = okResult(1, 1.5, 0.5)
         def html = generateWith(config, [(student): [(task): r]])
 
-        // extra points column should contain 0.5 (or formatted)
         assertTrue(html.contains(">0.50<") || html.contains(">0,50<") || html.contains("0.5"))
     }
 

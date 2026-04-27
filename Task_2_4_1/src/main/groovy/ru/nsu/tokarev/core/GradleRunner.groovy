@@ -1,6 +1,9 @@
 package ru.nsu.tokarev.core
 
+import java.util.logging.Logger
+
 class GradleRunner {
+    private static final Logger log = Logger.getLogger(GradleRunner.class.name)
     static ProcessResult runTask(File taskDir, int timeoutSec, String... tasks) {
         if (!taskDir.exists()) {
             return new ProcessResult(exitCode: 1, output: "Директория задачи не найдена: ${taskDir.absolutePath}")

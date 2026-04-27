@@ -9,9 +9,6 @@ import java.time.LocalDate
 import static org.junit.jupiter.api.Assertions.*
 
 class ModelTest {
-
-    // ---- CheckResult ----
-
     @Test
     void checkResultTestsString() {
         def r = new CheckResult()
@@ -44,8 +41,6 @@ class ModelTest {
         assertEquals("err", r.errorMessage)
     }
 
-    // ---- ProcessResult ----
-
     @Test
     void processResultSuccess() {
         def r = new ProcessResult(exitCode: 0, output: "ok")
@@ -57,8 +52,6 @@ class ModelTest {
         def r = new ProcessResult(exitCode: 1, output: "error")
         assertFalse(r.success)
     }
-
-    // ---- Task ----
 
     @Test
     void taskDateSetViaString() {
@@ -83,8 +76,6 @@ class ModelTest {
         assertTrue(t.toString().contains("2_1_1"))
     }
 
-    // ---- Student ----
-
     @Test
     void studentGettersSetters() {
         def s = new Student()
@@ -96,8 +87,6 @@ class ModelTest {
         assertEquals("https://github.com/nick1/OOP", s.repo)
         assertTrue(s.toString().contains("nick1"))
     }
-
-    // ---- Group ----
 
     @Test
     void groupAddStudent() {
@@ -117,7 +106,6 @@ class ModelTest {
         assertEquals(2, g.students.size())
     }
 
-    // ---- CheckPoint ----
 
     @Test
     void checkPointDateViaString() {
@@ -142,8 +130,6 @@ class ModelTest {
         assertEquals(1, cp.taskIds.size())
     }
 
-    // ---- ExtraPointsEntry ----
-
     @Test
     void extraPointsEntryGetters() {
         def e = new ExtraPointsEntry("nick1", "2_1_1", 0.5)
@@ -151,8 +137,6 @@ class ModelTest {
         assertEquals("2_1_1", e.taskId)
         assertEquals(0.5, e.points, 0.001)
     }
-
-    // ---- Settings ----
 
     @Test
     void settingsDefaults() {

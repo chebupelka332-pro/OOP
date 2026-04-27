@@ -34,9 +34,8 @@ class TestResultParserTest {
         def result = new CheckResult()
         TestResultParser.parseInto(tempDir.toFile(), result)
 
-        // passed = tests - failures - errors - skipped = 10 - 2 - 1 - 1 = 6
         assertEquals(6, result.passedTests)
-        assertEquals(3, result.failedTests)  // failures + errors
+        assertEquals(3, result.failedTests)
         assertEquals(1, result.skippedTests)
     }
 
@@ -61,13 +60,11 @@ class TestResultParserTest {
 
         TestResultParser.parseInto(tempDir.toFile(), result)
 
-        // no results dir → nothing changed
         assertEquals(99, result.passedTests)
     }
 
     @Test
     void fallbackToBuildTestResults() {
-        // create build/test-results (without /test subdirectory)
         def resultsDir = makeResultsDir("build/test-results")
         writeXml(resultsDir, "Suite", 4, 1, 0, 0)
 

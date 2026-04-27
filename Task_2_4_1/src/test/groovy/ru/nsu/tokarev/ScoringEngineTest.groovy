@@ -63,26 +63,22 @@ class ScoringEngineTest {
     @Test
     void betweenDeadlinesHalfFactor() {
         def t = task(2.0, "2025-01-01", "2030-01-01")
-        // commit 2026 > soft 2025 → factor 0.5
         assertEquals(1.0, ScoringEngine.calculate(t, ok(1, 0, 0), LocalDate.of(2026, 1, 1), new Settings()), 0.001)
     }
 
     @Test
     void afterHardDeadlineOnlyExtraPoints() {
         def t = task(2.0, "2020-01-01", "2021-01-01")
-        // factor=0, extraPoints=1 → score=1
         assertEquals(1.0, ScoringEngine.calculate(t, ok(5, 0, 0, 1.0), LocalDate.of(2026, 1, 1), new Settings()), 0.001)
     }
 
     @Test
     void partialTestsPassRate() {
-        // 3 passed, 1 failed → 3/4 * 4.0 = 3.0
         assertEquals(3.0, ScoringEngine.calculate(task(4.0), ok(3, 1, 0), null, new Settings()), 0.001)
     }
 
     @Test
     void skippedTestsCountInTotal() {
-        // 2 passed, 0 failed, 2 skipped → 2/4 * 4.0 = 2.0
         assertEquals(2.0, ScoringEngine.calculate(task(4.0), ok(2, 0, 2), null, new Settings()), 0.001)
     }
 
@@ -99,7 +95,6 @@ class ScoringEngineTest {
 
     @Test
     void commitDateNullWhenNosoftDeadline() {
-        // softDeadline null → factor always 1.0 regardless of commitDate
         assertEquals(1.0, ScoringEngine.calculate(task(1.0), ok(1, 0, 0), LocalDate.of(2020, 1, 1), new Settings()), 0.001)
     }
 
@@ -129,7 +124,7 @@ class ScoringEngineTest {
         s.activityBonusEnabled = true
         s.activityThreshold = 0.8
         s.activityBonus = 1.0
-        // 7.0 + 1.0 = 8.0 → отлично (was хорошо)
+
         assertEquals("отлично", ScoringEngine.grade(7.0, s, 0.9))
     }
 

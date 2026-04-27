@@ -62,7 +62,6 @@ class GitClientTest {
 
     @Test
     void getLastCommitDateForMissingPathReturnsNull() {
-        // no commits touch nonexistent path
         def date = GitClient.getLastCommitDate(repoDir, "nonexistent/path/xyz")
         assertNull(date)
     }
@@ -78,15 +77,12 @@ class GitClientTest {
     void getAllCommitDatesEmptyOnNonGitDir() {
         def plain = new File(repoDir, "subdir")
         plain.mkdirs()
-        // subdir is not a git repo, git log will fail
         def result = GitClient.run(["git", "log", "--format=%ci"], plain)
-        // may fail or succeed depending on parent repo, just verify no exception
         assertNotNull(result)
     }
 
     @Test
     void computeActivityWithSingleCommit() {
-        // one commit today → at least one active week
         def activity = GitClient.computeWeeklyActivity(repoDir, null, null)
         assertTrue(activity > 0.0)
         assertTrue(activity <= 1.0)
@@ -94,7 +90,6 @@ class GitClientTest {
 
     @Test
     void computeActivityWithMultipleCommits() {
-        // add more commits
         new File(repoDir, "file2.txt").text = "content"
         run("git", "add", ".")
         run("git", "commit", "-m", "second commit")
@@ -114,7 +109,6 @@ class GitClientTest {
 
     @Test
     void cloneOrPullClonesLocalRepo() {
-        // use the temp git repo as the "remote" (local path works as git URL)
         def student = new ru.nsu.tokarev.model.Student()
         student.nick = "testuser"
         student.fullName = "Test User"
@@ -135,9 +129,8 @@ class GitClientTest {
         student.repo = repoDir.absolutePath
 
         def workDir = new File(tempDir.toFile(), "work2")
-        // first clone
         GitClient.cloneOrPull(student, workDir)
-        // second call → should pull (repo already exists)
+
         def pulled = GitClient.cloneOrPull(student, workDir)
         assertTrue(pulled.exists())
     }

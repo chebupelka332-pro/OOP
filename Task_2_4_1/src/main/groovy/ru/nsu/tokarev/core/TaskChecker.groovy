@@ -5,8 +5,12 @@ import ru.nsu.tokarev.model.CheckResult
 import ru.nsu.tokarev.model.Student
 import ru.nsu.tokarev.model.Task
 
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.Executors
+import java.util.logging.Logger
 
 class TaskChecker {
+    private static final Logger log = Logger.getLogger(TaskChecker.class.name)
     private final CheckerConfig config
     private final File workDir
 
@@ -18,22 +22,40 @@ class TaskChecker {
     Map<Student, Map<Task, CheckResult>> checkAll() {
         def students = config.studentsToCheck
         def tasks = config.tasksToCheck
-        def results = [:]
+        def results = new ConcurrentHashMap()
+        int nThreads = Math.max(1, tasks.size())
+        def executor = Executors.newFixedThreadPool(nThreads)
 
-        students.each { student ->
-            System.err.println("Обработка студента: ${student.fullName} (${student.nick})")
-            File repoDir = null
-            try {
-                repoDir = GitClient.cloneOrPull(student, workDir)
-            } catch (Exception e) {
-                System.err.println("  Ошибка клонирования: ${e.message}")
-            }
+        try {
+            students.each { student ->
+                log.info("Обработка студента: ${student.fullName} (${student.nick})")
+                File repoDir = null
+                try {
+                    repoDir = GitClient.cloneOrPull(student, workDir)
+                } catch (Exception e) {
+                    log.warning("Ошибка клонирования: ${e.message}")
+                }
 
-            def studentResults = [:]
-            tasks.each { task ->
-                studentResults[task] = checkTask(student, task, repoDir)
+                def repoDirFinal = repoDir
+                def studentResults = new ConcurrentHashMap()
+                def futures = tasks.collect { task ->
+                    executor.submit {
+                        try {
+                            studentResults[task] = checkTask(student, task, repoDirFinal)
+                        } catch (Exception e) {
+                            log.severe("Необработанная ошибка: задача ${task.id}, студент ${student.nick}: ${e.message}")
+                            def err = new CheckResult()
+                            err.buildSuccess = false
+                            err.errorMessage = "Внутренняя ошибка: ${e.message}"
+                            studentResults[task] = err
+                        }
+                    }
+                }
+                futures.each { it.get() }
+                results[student] = studentResults
             }
-            results[student] = studentResults
+        } finally {
+            executor.shutdown()
         }
         return results
     }
@@ -55,17 +77,17 @@ class TaskChecker {
             return result
         }
 
-        System.err.println("  Задача ${task.id}: сборка...")
+        log.info("  Задача ${task.id}: сборка...")
         def buildResult = GradleRunner.build(taskDir, timeout)
         result.buildSuccess = buildResult.success
         result.buildLog = buildResult.output
 
         if (!result.buildSuccess) {
-            System.err.println("  Задача ${task.id}: сборка провалена\n${buildResult.output.readLines().takeRight(10).join('\n')}")
+            log.warning("  Задача ${task.id}: сборка провалена\n${buildResult.output.readLines().takeRight(10).join('\n')}")
             return result
         }
 
-        System.err.println("  Задача ${task.id}: документация...")
+        log.info("  Задача ${task.id}: документация...")
         def docsResult = GradleRunner.generateDocs(taskDir, timeout)
         result.docsSuccess = docsResult.success
 
@@ -77,19 +99,19 @@ class TaskChecker {
         }
 
         if (!result.docsSuccess || !result.styleSuccess) {
-            System.err.println("  Задача ${task.id}: документация/стиль не прошли")
+            log.warning("  Задача ${task.id}: документация/стиль не прошли")
             return result
         }
 
-        System.err.println("  Задача ${task.id}: тесты...")
-        def testResult = GradleRunner.runTests(taskDir, timeout)
+        log.info("  Задача ${task.id}: тесты...")
+        GradleRunner.runTests(taskDir, timeout)
         TestResultParser.parseInto(taskDir, result)
 
         def commitDate = GitClient.getLastCommitDate(repoDir, "Task_${task.id}")
         result.extraPoints = config.settings.getExtraPointsFor(student.nick, task.id)
         result.score = ScoringEngine.calculate(task, result, commitDate, config.settings)
 
-        System.err.println("  Задача ${task.id}: балл = ${result.score}")
+        log.info("  Задача ${task.id}: балл = ${result.score}")
         return result
     }
 

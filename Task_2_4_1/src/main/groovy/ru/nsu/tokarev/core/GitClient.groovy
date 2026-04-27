@@ -4,8 +4,10 @@ import ru.nsu.tokarev.model.Student
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.logging.Logger
 
 class GitClient {
+    private static final Logger log = Logger.getLogger(GitClient.class.name)
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
     static File cloneOrPull(Student student, File workDir) {
