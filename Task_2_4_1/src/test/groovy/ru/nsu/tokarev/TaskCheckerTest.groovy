@@ -13,10 +13,28 @@ import java.nio.file.Path
 
 import static org.junit.jupiter.api.Assertions.*
 
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+
 class TaskCheckerTest {
 
     @TempDir
     Path tempDir
+
+    private PrintStream originalOut
+    private ByteArrayOutputStream capturedOut
+
+    @BeforeEach
+    void captureStdout() {
+        originalOut = System.out
+        capturedOut = new ByteArrayOutputStream()
+        System.setOut(new PrintStream(capturedOut, true, "UTF-8"))
+    }
+
+    @AfterEach
+    void restoreStdout() {
+        System.setOut(originalOut)
+    }
 
     private CheckerConfig buildConfig(String workDirPath, String nick, String taskId) {
         def config = new CheckerConfig()
@@ -190,6 +208,54 @@ ${failedXml}
         def taskResult = results.values().first().values().first()
         assertFalse(taskResult.buildSuccess)
         assertTrue(taskResult.errorMessage.contains("не найдена"))
+    }
+
+    @Test
+    void fullApplicationRunProducesHtmlReport() {
+        def workDir = tempDir.toFile()
+
+        def repoDir = new File(workDir, "int-student")
+        repoDir.mkdirs()
+        def taskDir = createTaskDir(repoDir, "1_1", 0)
+        createTestResults(taskDir, 5, 0)
+        initGitRepo(repoDir)
+
+        def configFile = new File(workDir, "checker.groovy")
+        configFile.text = """\
+groups {
+    group {
+        name = "int-group"
+        students {
+            student {
+                nick = "int-student"
+                fullName = "Integration Tester"
+                repo = "https://dummy.invalid"
+            }
+        }
+    }
+}
+tasks {
+    task {
+        id = "1_1"
+        name = "Integration Task"
+        maxScore = 10.0
+    }
+}
+settings {
+    workDir = "${workDir.absolutePath.replace('\\', '/')}"
+    checkStyleEnabled = false
+    timeout = 30
+}
+"""
+
+        Main.main("test", "--config", configFile.absolutePath)
+
+        def html = capturedOut.toString("UTF-8")
+        assertTrue(html.contains("<!DOCTYPE html>"), "Отчёт должен быть HTML-документом")
+        assertTrue(html.contains("Integration Tester"), "Отчёт должен содержать имя студента")
+        assertTrue(html.contains("Integration Task"), "Отчёт должен содержать название задачи")
+        assertTrue(html.contains("int-group"), "Отчёт должен содержать название группы")
+        assertTrue(html.contains("</html>"), "HTML должен быть закрыт")
     }
 
     @Test
