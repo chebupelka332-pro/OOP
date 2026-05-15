@@ -89,8 +89,14 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Field</div>
 <div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code>static final int</code></div>
+<div class="col-second even-row-color"><code><a href="#CHUNK_SIZE" class="member-name-link">CHUNK_SIZE</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>static final byte</code></div>
+<div class="col-second odd-row-color"><code><a href="#MSG_CANCEL" class="member-name-link">MSG_CANCEL</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static final byte</code></div>
-<div class="col-second even-row-color"><code><a href="#MSG_CANCEL" class="member-name-link">MSG_CANCEL</a></code></div>
+<div class="col-second even-row-color"><code><a href="#MSG_NO_MORE_TASKS" class="member-name-link">MSG_NO_MORE_TASKS</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final byte</code></div>
 <div class="col-second odd-row-color"><code><a href="#MSG_RESULT" class="member-name-link">MSG_RESULT</a></code></div>
@@ -122,13 +128,16 @@ loadScripts(document, 'script');</script>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#writeCancel(java.io.DataOutputStream)" class="member-name-link">writeCancel</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/DataOutputStream.html" title="class or interface in java.io" class="external-link">DataOutputStream</a>&nbsp;out)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#writeResult(java.io.DataOutputStream,boolean)" class="member-name-link">writeResult</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/DataOutputStream.html" title="class or interface in java.io" class="external-link">DataOutputStream</a>&nbsp;out,
- boolean&nbsp;found)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#writeNoMoreTasks(java.io.DataOutputStream)" class="member-name-link">writeNoMoreTasks</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/DataOutputStream.html" title="class or interface in java.io" class="external-link">DataOutputStream</a>&nbsp;out)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#writeTask(java.io.DataOutputStream,int%5B%5D)" class="member-name-link">writeTask</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/DataOutputStream.html" title="class or interface in java.io" class="external-link">DataOutputStream</a>&nbsp;out,
- int[]&nbsp;chunk)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#writeResult(java.io.DataOutputStream,boolean)" class="member-name-link">writeResult</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/DataOutputStream.html" title="class or interface in java.io" class="external-link">DataOutputStream</a>&nbsp;out,
+ boolean&nbsp;found)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#writeTask(java.io.DataOutputStream,int%5B%5D)" class="member-name-link">writeTask</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/DataOutputStream.html" title="class or interface in java.io" class="external-link">DataOutputStream</a>&nbsp;out,
+ int[]&nbsp;chunk)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
 </div>
@@ -183,6 +192,34 @@ loadScripts(document, 'script');</script>
 <dd>
 <ul class="see-list">
 <li><a href="../../../../constant-values.html#ru.nsu.tokarev.FindCompositeNumber.Protocol.MSG_CANCEL">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="MSG_NO_MORE_TASKS">
+<h3>MSG_NO_MORE_TASKS</h3>
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type">byte</span>&nbsp;<span class="element-name">MSG_NO_MORE_TASKS</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><a href="../../../../constant-values.html#ru.nsu.tokarev.FindCompositeNumber.Protocol.MSG_NO_MORE_TASKS">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="CHUNK_SIZE">
+<h3>CHUNK_SIZE</h3>
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">CHUNK_SIZE</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><a href="../../../../constant-values.html#ru.nsu.tokarev.FindCompositeNumber.Protocol.CHUNK_SIZE">Constant Field Values</a></li>
 </ul>
 </dd>
 </dl>
@@ -247,6 +284,17 @@ loadScripts(document, 'script');</script>
 <h3>writeCancel</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">writeCancel</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/DataOutputStream.html" title="class or interface in java.io" class="external-link">DataOutputStream</a>&nbsp;out)</span>
                         throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></span></div>
+<dl class="notes">
+<dt>Throws:</dt>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></code></dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="writeNoMoreTasks(java.io.DataOutputStream)">
+<h3>writeNoMoreTasks</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">writeNoMoreTasks</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/DataOutputStream.html" title="class or interface in java.io" class="external-link">DataOutputStream</a>&nbsp;out)</span>
+                             throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></span></div>
 <dl class="notes">
 <dt>Throws:</dt>
 <dd><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></code></dd>

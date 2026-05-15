@@ -80,8 +80,25 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color class-summary class-summary-tab2"><a href="Main.html" title="class in ru.nsu.tokarev">Main</a></div>
 <div class="col-last even-row-color class-summary class-summary-tab2">&nbsp;</div>
-<div class="col-first odd-row-color class-summary class-summary-tab2"><a href="WorkerMain.html" title="class in ru.nsu.tokarev">WorkerMain</a></div>
-<div class="col-last odd-row-color class-summary class-summary-tab2">&nbsp;</div>
+<div class="col-first odd-row-color class-summary class-summary-tab2"><a href="MasterMain.html" title="class in ru.nsu.tokarev">MasterMain</a></div>
+<div class="col-last odd-row-color class-summary class-summary-tab2">
+<div class="block">Запуск с числами явно:
+   java -jar master.jar [port] [n1 n2 n3 ...]
+
+ Запуск с генерацией N больших простых:
+   java -jar master.jar [port] --generate N
+
+ Запуск с генерацией N-1 простых + 1 составного в конце:
+   java -jar master.jar [port] --generate-composite N
+
+ Примеры:
+   java -jar master.jar 12345 --generate 5000
+   java -jar master.jar 12345 --generate-composite 5000</div>
+</div>
+<div class="col-first even-row-color class-summary class-summary-tab2"><a href="WorkerMain.html" title="class in ru.nsu.tokarev">WorkerMain</a></div>
+<div class="col-last even-row-color class-summary class-summary-tab2">
+<div class="block">Запуск: java -jar worker.jar [host] [port]</div>
+</div>
 </div>
 </div>
 </li>
