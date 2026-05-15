@@ -75,4 +75,13 @@ public class ProtocolTest {
         DataInputStream in = new DataInputStream(new ByteArrayInputStream(baos.toByteArray()));
         assertEquals(Protocol.MSG_CANCEL, in.readByte());
     }
+
+    @Test
+    void testWriteNoMoreTasks() throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        Protocol.writeNoMoreTasks(new DataOutputStream(baos));
+
+        DataInputStream in = new DataInputStream(new ByteArrayInputStream(baos.toByteArray()));
+        assertEquals(Protocol.MSG_NO_MORE_TASKS, in.readByte());
+    }
 }

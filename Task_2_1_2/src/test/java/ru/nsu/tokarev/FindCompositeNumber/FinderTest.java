@@ -8,6 +8,11 @@ import ru.nsu.tokarev.FindCompositeNumber.Finders.MultiThreadFinder;
 import ru.nsu.tokarev.FindCompositeNumber.Finders.ParallelStreamFinder;
 import ru.nsu.tokarev.FindCompositeNumber.Finders.SingleThreadFinder;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FinderTest {
@@ -48,11 +53,11 @@ public class FinderTest {
         int[] input = {6, 8, 7, 13, 5, 9, 4};
         int workerCount = 3;
 
-        DistributedFinder finder = new DistributedFinder(0, workerCount, 5000);
+        DistributedFinder finder = new DistributedFinder(0, 5000);
         int port = finder.getPort();
 
         for (int i = 0; i < workerCount; i++) {
-            new Thread(new CompositeWorker("localhost", port, new SingleThreadFinder())).start();
+            new Thread(new CompositeWorker("localhost", port)).start();
         }
 
         assertTrue(finder.containsComposite(input, new AtomicBoolean(false)));
@@ -64,11 +69,11 @@ public class FinderTest {
                        6998009, 6998029, 6998039, 20165149, 6998051, 6998053};
         int workerCount = 4;
 
-        DistributedFinder finder = new DistributedFinder(0, workerCount, 5000);
+        DistributedFinder finder = new DistributedFinder(0, 5000);
         int port = finder.getPort();
 
         for (int i = 0; i < workerCount; i++) {
-            new Thread(new CompositeWorker("localhost", port, new SingleThreadFinder())).start();
+            new Thread(new CompositeWorker("localhost", port)).start();
         }
 
         assertFalse(finder.containsComposite(input, new AtomicBoolean(false)));
@@ -76,16 +81,61 @@ public class FinderTest {
 
     @Test
     public void testDistributedFaultTolerance() throws Exception {
-        // Master expects 3 workers, but only 1 connects — rest processed locally
         int[] input = {6, 8, 7, 13, 5, 9, 4};
-        int workerCount = 3;
 
-        DistributedFinder finder = new DistributedFinder(0, workerCount, 2000);
+        DistributedFinder finder = new DistributedFinder(0, 5000);
         int port = finder.getPort();
 
-        // Start only 1 worker instead of 3
-        new Thread(new CompositeWorker("localhost", port, new SingleThreadFinder())).start();
+        new Thread(new CompositeWorker("localhost", port)).start();
 
         assertTrue(finder.containsComposite(input, new AtomicBoolean(false)));
+    }
+
+    @Test
+    public void testDistributedWorkerCrashRetransmits() throws Exception {
+        int[] input = {6, 8, 7, 13, 5, 9, 4};
+
+        DistributedFinder finder = new DistributedFinder(0, 5000);
+        int port = finder.getPort();
+
+        // Плохой воркер
+        new Thread(() -> {
+            try (Socket s = new Socket("localhost", port)) {
+                DataInputStream in = new DataInputStream(s.getInputStream());
+                byte tag = in.readByte();
+                if (tag == Protocol.MSG_TASK) {
+                    Protocol.readTask(in);
+                }
+                // Закрываем без ответа имитируя падение
+            } catch (IOException ignored) {}
+        }).start();
+
+        Thread.sleep(100);
+
+        // Хороший воркер подхватит переотправленный чанк
+        new Thread(new CompositeWorker("localhost", port)).start();
+
+        assertTrue(finder.containsComposite(input, new AtomicBoolean(false)));
+    }
+
+    @Test
+    public void testDistributedReconnect() throws Exception {
+        int[] input = {20319251, 6997901, 6997927, 6997937, 17858849, 6997967,
+                       6998009, 6998029, 6998039, 20165149, 6998051, 6998053};
+
+        DistributedFinder finder = new DistributedFinder(0, 5000);
+        int port = finder.getPort();
+
+        new Thread(() -> {
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return;
+            }
+            new CompositeWorker("localhost", port).run();
+        }).start();
+
+        assertFalse(finder.containsComposite(input, new AtomicBoolean(false)));
     }
 }

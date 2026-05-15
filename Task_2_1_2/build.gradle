@@ -24,6 +24,24 @@ test {
     useJUnitPlatform()
 }
 
+tasks.register('masterJar', Jar) {
+    archiveBaseName = 'master'
+    manifest {
+        attributes 'Main-Class': 'ru.nsu.tokarev.MasterMain'
+    }
+    from sourceSets.main.output
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.register('workerJar', Jar) {
+    archiveBaseName = 'worker'
+    manifest {
+        attributes 'Main-Class': 'ru.nsu.tokarev.WorkerMain'
+    }
+    from sourceSets.main.output
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 jacocoTestReport {
     reports {
         xml.required = true
@@ -32,6 +50,7 @@ jacocoTestReport {
         classDirectories.setFrom(files(classDirectories.files.collect {
             fileTree(dir: it, exclude: [
                     'ru/nsu/tokarev/Main.class',
+                    'ru/nsu/tokarev/MasterMain.class',
                     'ru/nsu/tokarev/WorkerMain.class'
             ])
         }))

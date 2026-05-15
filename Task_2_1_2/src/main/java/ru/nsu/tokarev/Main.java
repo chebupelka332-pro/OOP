@@ -1,10 +1,12 @@
 package ru.nsu.tokarev;
 
-import ru.nsu.tokarev.FindCompositeNumber.Finders.DistributedFinder;
 import ru.nsu.tokarev.FindCompositeNumber.CompositeWorker;
+import ru.nsu.tokarev.FindCompositeNumber.Finders.DistributedFinder;
 import ru.nsu.tokarev.FindCompositeNumber.Finders.MultiThreadFinder;
 import ru.nsu.tokarev.FindCompositeNumber.Finders.ParallelStreamFinder;
 import ru.nsu.tokarev.FindCompositeNumber.Finders.SingleThreadFinder;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Main {
@@ -38,21 +40,27 @@ public class Main {
         end = System.nanoTime();
         System.out.println("ParallelStream: " + (end - start) / 1_000_000 + " ms, Result: " + res3);
 
-        // Distributed benchmark
-        int[] distributedWorkerCounts = {2, 4, 8, 12, 16, 22};
-        for (int wc : distributedWorkerCounts) {
+        // Distributed benchmark: master не считает локально, все задачи — воркерам
+        int[] workerCounts = {2, 4, 8, 12, 16, 22};
+        for (int wc : workerCounts) {
             try {
-                DistributedFinder distFn = new DistributedFinder(0, wc, 30000);
+                DistributedFinder distFn = new DistributedFinder(0, 30000);
                 int actualPort = distFn.getPort();
 
+                List<Thread> workerThreads = new ArrayList<>();
                 for (int i = 0; i < wc; i++) {
-                    new Thread(new CompositeWorker("localhost", actualPort, new SingleThreadFinder())).start();
+                    Thread t = new Thread(new CompositeWorker("localhost", actualPort));
+                    t.setDaemon(true);
+                    t.start();
+                    workerThreads.add(t);
                 }
 
                 start = System.nanoTime();
                 boolean res4 = distFn.containsComposite(data, new AtomicBoolean(false));
                 end = System.nanoTime();
                 System.out.println("Distributed (" + wc + " workers): " + (end - start) / 1_000_000 + " ms, Result: " + res4);
+
+                // Воркеры — daemon-потоки, завершатся при выходе JVM
             } catch (Exception e) {
                 System.out.println("Distributed (" + wc + " workers): ERROR - " + e.getMessage());
             }

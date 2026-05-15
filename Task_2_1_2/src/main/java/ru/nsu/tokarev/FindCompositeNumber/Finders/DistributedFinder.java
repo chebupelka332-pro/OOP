@@ -2,27 +2,25 @@ package ru.nsu.tokarev.FindCompositeNumber.Finders;
 
 import ru.nsu.tokarev.FindCompositeNumber.Protocol;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class DistributedFinder implements CompositeFinder {
-    private final int workerCount;
-    private final int timeoutMs;
+    private final ServerSocket serverSocket;
 
-    private ServerSocket serverSocket;
-
-    public DistributedFinder(int port, int workerCount, int timeoutMs) throws IOException {
-        this.workerCount = workerCount;
-        this.timeoutMs = timeoutMs;
+    public DistributedFinder(int port, int acceptTimeoutMs) throws IOException {
         this.serverSocket = new ServerSocket(port);
-        this.serverSocket.setSoTimeout(timeoutMs);
+        this.serverSocket.setSoTimeout(acceptTimeoutMs);
     }
 
     public int getPort() {
@@ -36,135 +34,65 @@ public class DistributedFinder implements CompositeFinder {
             return false;
         }
 
-        int actualWorkers = Math.min(workerCount, numbers.length);
-        int[][] chunks = splitIntoChunks(numbers, actualWorkers);
+        List<int[]> allChunks = buildChunks(numbers);
+        BlockingQueue<int[]> taskQueue = new LinkedBlockingQueue<>(allChunks);
+        AtomicInteger remaining = new AtomicInteger(allChunks.size());
+        AtomicBoolean foundComposite = new AtomicBoolean(false);
+        AtomicBoolean done = new AtomicBoolean(false);
 
-        List<Socket> connections = new ArrayList<>();
-        List<int[]> unprocessedChunks = new ArrayList<>();
+        ExecutorService pool = Executors.newCachedThreadPool();
 
-        // Accept worker connections
-        for (int i = 0; i < actualWorkers; i++) {
+        Thread acceptor = new Thread(() -> {
             try {
-                Socket socket = serverSocket.accept();
-                socket.setSoTimeout(timeoutMs);
-                connections.add(socket);
-            } catch (SocketTimeoutException e) {
-                // Worker didn't connect in time - handle remaining chunks locally
-                for (int j = connections.size(); j < actualWorkers; j++) {
-                    unprocessedChunks.add(chunks[j]);
-                }
-                break;
-            } catch (IOException e) {
-                for (int j = connections.size(); j < actualWorkers; j++) {
-                    unprocessedChunks.add(chunks[j]);
-                }
-                break;
-            }
-        }
-
-        closeServerSocket();
-
-        // Send tasks to connected workers
-        List<Socket> activeConnections = new ArrayList<>();
-        for (int i = 0; i < connections.size(); i++) {
-            Socket socket = connections.get(i);
-            try {
-                DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-                Protocol.writeTask(out, chunks[i]);
-                activeConnections.add(socket);
-            } catch (IOException e) {
-                unprocessedChunks.add(chunks[i]);
-                closeSocket(socket);
-            }
-        }
-
-        AtomicBoolean found = new AtomicBoolean(false);
-
-        // Collect results from workers
-        List<Thread> resultThreads = new ArrayList<>();
-        List<Socket> socketsToCancel = new ArrayList<>(activeConnections);
-
-        for (Socket socket : activeConnections) {
-            Thread t = new Thread(() -> {
-                try {
-                    DataInputStream in = new DataInputStream(socket.getInputStream());
-                    byte tag = in.readByte();
-                    if (tag == Protocol.MSG_RESULT) {
-                        boolean workerFound = Protocol.readResult(in);
-                        if (workerFound) {
-                            found.set(true);
-                            sendCancelToAll(socketsToCancel, socket);
+                while (!done.get() && !cancelled.get() && !foundComposite.get()) {
+                    try {
+                        Socket s = serverSocket.accept();
+                        pool.submit(new WorkerHandler(s, taskQueue, remaining, foundComposite, cancelled));
+                    } catch (SocketTimeoutException e) {
+                        if (remaining.get() == 0) {
+                            done.set(true);
                         }
                     }
-                } catch (IOException e) {
-                    // Worker failed — ignore, result not counted
-                } finally {
-                    closeSocket(socket);
                 }
-            });
-            t.start();
-            resultThreads.add(t);
-        }
-
-        // If externally cancelled - notify all workers and stop
-        if (cancelled.get()) {
-            sendCancelToAll(socketsToCancel, null);
-            for (Thread t : resultThreads) {
-                try { t.join(); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+            } catch (IOException e) {
+                done.set(true);
+            } finally {
+                closeServerSocket();
             }
-            return false;
-        }
+        });
+        acceptor.setDaemon(true);
+        acceptor.start();
 
-        // Process failed/unconnected chunks locally
-        SingleThreadFinder local = new SingleThreadFinder();
-        for (int[] chunk : unprocessedChunks) {
-            if (found.get() || cancelled.get()) break;
-            if (local.containsComposite(chunk, cancelled)) {
-                found.set(true);
-                sendCancelToAll(socketsToCancel, null);
+        while (!done.get() && !foundComposite.get() && !cancelled.get()) {
+            if (remaining.get() == 0) {
+                done.set(true);
+            } else {
+                try {
+                    Thread.sleep(20);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
             }
         }
 
-        // Wait for all worker result threads
-        for (Thread t : resultThreads) {
-            try {
-                t.join();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
+        done.set(true);
+        closeServerSocket();
+        pool.shutdown();
 
-        return found.get();
+        return foundComposite.get();
     }
 
-    private int[][] splitIntoChunks(int[] numbers, int count) {
+    private List<int[]> buildChunks(int[] numbers) {
+        List<int[]> chunks = new ArrayList<>();
         int len = numbers.length;
-        int chunkSize = (len + count - 1) / count;
-        int[][] chunks = new int[count][];
-        for (int i = 0; i < count; i++) {
-            int start = i * chunkSize;
-            int end = Math.min(start + chunkSize, len);
+        for (int start = 0; start < len; start += Protocol.CHUNK_SIZE) {
+            int end = Math.min(start + Protocol.CHUNK_SIZE, len);
             int[] chunk = new int[end - start];
             System.arraycopy(numbers, start, chunk, 0, end - start);
-            chunks[i] = chunk;
+            chunks.add(chunk);
         }
         return chunks;
-    }
-
-    private void sendCancelToAll(List<Socket> sockets, Socket except) {
-        for (Socket s : sockets) {
-            if (s == except) continue;
-            try {
-                DataOutputStream out = new DataOutputStream(s.getOutputStream());
-                Protocol.writeCancel(out);
-            } catch (IOException ignored) {}
-        }
-    }
-
-    private void closeSocket(Socket socket) {
-        try {
-            socket.close();
-        } catch (IOException ignored) {}
     }
 
     private void closeServerSocket() {

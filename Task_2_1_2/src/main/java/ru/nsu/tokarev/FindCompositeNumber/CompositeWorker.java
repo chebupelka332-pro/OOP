@@ -1,57 +1,62 @@
 package ru.nsu.tokarev.FindCompositeNumber;
 
-import ru.nsu.tokarev.FindCompositeNumber.Finders.CompositeFinder;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CompositeWorker implements Runnable {
+    private static final int RECONNECT_DELAY_MS = 500;
+
     private final String masterHost;
     private final int masterPort;
-    private final CompositeFinder finder;
+    private final PrimeCache cache = new PrimeCache();
 
-    public CompositeWorker(String masterHost, int masterPort, CompositeFinder finder) {
+    public CompositeWorker(String masterHost, int masterPort) {
         this.masterHost = masterHost;
         this.masterPort = masterPort;
-        this.finder = finder;
     }
 
     @Override
     public void run() {
-        try (Socket socket = new Socket(masterHost, masterPort)) {
-            DataInputStream in  = new DataInputStream(socket.getInputStream());
-            DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-
-            byte tag = in.readByte();
-            if (tag != Protocol.MSG_TASK) {
-                return;
+        while (!Thread.currentThread().isInterrupted()) {
+            Socket socket;
+            try {
+                socket = new Socket(masterHost, masterPort);
+            } catch (IOException e) {
+                try {
+                    Thread.sleep(RECONNECT_DELAY_MS);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    return;
+                }
+                continue;
             }
 
-            int[] chunk = Protocol.readTask(in);
+            try (socket) {
+                DataInputStream in = new DataInputStream(socket.getInputStream());
+                DataOutputStream out = new DataOutputStream(socket.getOutputStream());
 
-            AtomicBoolean cancelled = new AtomicBoolean(false);
-
-            // Daemon thread listening for CANCEL from master
-            Thread cancelListener = new Thread(() -> {
-                try {
-                    byte msg = in.readByte();
-                    if (msg == Protocol.MSG_CANCEL) {
-                        cancelled.set(true);
+                while (true) {
+                    byte tag = in.readByte();
+                    if (tag == Protocol.MSG_TASK) {
+                        int[] chunk = Protocol.readTask(in);
+                        boolean found = computeWithCache(chunk);
+                        Protocol.writeResult(out, found);
+                    } else if (tag == Protocol.MSG_CANCEL || tag == Protocol.MSG_NO_MORE_TASKS) {
+                        return;
                     }
-                } catch (IOException ignored) {
-                    // Socket closed or master disconnected - treat as cancel
-                    cancelled.set(true);
                 }
-            });
-            cancelListener.setDaemon(true);
-            cancelListener.start();
+            } catch (IOException e) {
+                // Соединение прервано - попробуем переподключиться
+            }
+        }
+    }
 
-            boolean found = finder.containsComposite(chunk, cancelled);
-
-            Protocol.writeResult(out, found);
-        } catch (IOException e) {}
+    private boolean computeWithCache(int[] chunk) {
+        for (int n : chunk) {
+            if (!cache.isPrime(n)) return true;
+        }
+        return false;
     }
 }

@@ -5,9 +5,12 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public final class Protocol {
-    public static final byte MSG_TASK   = 0x01;
-    public static final byte MSG_RESULT = 0x02;
-    public static final byte MSG_CANCEL = 0x03;
+    public static final byte MSG_TASK          = 0x01;
+    public static final byte MSG_RESULT        = 0x02;
+    public static final byte MSG_CANCEL        = 0x03;
+    public static final byte MSG_NO_MORE_TASKS = 0x04;
+
+    public static final int CHUNK_SIZE = 128;
 
     private Protocol() {}
 
@@ -41,6 +44,11 @@ public final class Protocol {
 
     public static void writeCancel(DataOutputStream out) throws IOException {
         out.writeByte(MSG_CANCEL);
+        out.flush();
+    }
+
+    public static void writeNoMoreTasks(DataOutputStream out) throws IOException {
+        out.writeByte(MSG_NO_MORE_TASKS);
         out.flush();
     }
 }
