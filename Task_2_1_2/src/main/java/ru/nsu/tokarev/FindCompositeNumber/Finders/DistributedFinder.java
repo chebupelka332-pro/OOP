@@ -8,10 +8,14 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -39,19 +43,30 @@ public class DistributedFinder implements CompositeFinder {
         AtomicInteger remaining = new AtomicInteger(allChunks.size());
         AtomicBoolean foundComposite = new AtomicBoolean(false);
         AtomicBoolean done = new AtomicBoolean(false);
+        Set<Socket> activeSockets = ConcurrentHashMap.newKeySet();
 
         ExecutorService pool = Executors.newCachedThreadPool();
 
         Thread acceptor = new Thread(() -> {
             try {
                 while (!done.get() && !cancelled.get() && !foundComposite.get()) {
+                    Socket s;
                     try {
-                        Socket s = serverSocket.accept();
-                        pool.submit(new WorkerHandler(s, taskQueue, remaining, foundComposite, cancelled));
+                        s = serverSocket.accept();
                     } catch (SocketTimeoutException e) {
                         if (remaining.get() == 0) {
                             done.set(true);
                         }
+                        continue;
+                    }
+
+                    activeSockets.add(s);
+                    try {
+                        pool.submit(new WorkerHandler(s, taskQueue, remaining,
+                                foundComposite, cancelled, activeSockets));
+                    } catch (RejectedExecutionException ex) {
+                        activeSockets.remove(s);
+                        try { s.close(); } catch (IOException ignored) {}
                     }
                 }
             } catch (IOException e) {
@@ -79,6 +94,14 @@ public class DistributedFinder implements CompositeFinder {
         done.set(true);
         closeServerSocket();
         pool.shutdown();
+        try {
+            if (!pool.awaitTermination(500, TimeUnit.MILLISECONDS)) {
+                closeAllSockets(activeSockets);
+                pool.awaitTermination(2, TimeUnit.SECONDS);
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
 
         return foundComposite.get();
     }
@@ -101,5 +124,11 @@ public class DistributedFinder implements CompositeFinder {
                 serverSocket.close();
             }
         } catch (IOException ignored) {}
+    }
+
+    private static void closeAllSockets(Set<Socket> sockets) {
+        for (Socket s : sockets) {
+            try { s.close(); } catch (IOException ignored) {}
+        }
     }
 }

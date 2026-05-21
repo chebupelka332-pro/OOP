@@ -33,22 +33,32 @@ public class CompositeWorker implements Runnable {
                 continue;
             }
 
-            try (socket) {
-                DataInputStream in = new DataInputStream(socket.getInputStream());
-                DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+            try (Socket sock = socket;
+                 DataInputStream in = new DataInputStream(sock.getInputStream());
+                 DataOutputStream out = new DataOutputStream(sock.getOutputStream())) {
 
-                while (true) {
-                    byte tag = in.readByte();
-                    if (tag == Protocol.MSG_TASK) {
-                        int[] chunk = Protocol.readTask(in);
-                        boolean found = computeWithCache(chunk);
-                        Protocol.writeResult(out, found);
-                    } else if (tag == Protocol.MSG_CANCEL || tag == Protocol.MSG_NO_MORE_TASKS) {
-                        return;
-                    }
+                if (!handleSession(in, out)) {
+                    return;
                 }
             } catch (IOException e) {
                 // Соединение прервано - попробуем переподключиться
+            }
+        }
+    }
+
+    /**
+     * @return false если получен сигнал остановки (MSG_CANCEL/MSG_NO_MORE_TASKS),
+     *         true если соединение оборвалось и стоит попробовать переподключиться.
+     */
+    private boolean handleSession(DataInputStream in, DataOutputStream out) throws IOException {
+        while (true) {
+            byte tag = in.readByte();
+            if (tag == Protocol.MSG_TASK) {
+                int[] chunk = Protocol.readTask(in);
+                boolean found = computeWithCache(chunk);
+                Protocol.writeResult(out, found);
+            } else if (tag == Protocol.MSG_CANCEL || tag == Protocol.MSG_NO_MORE_TASKS) {
+                return false;
             }
         }
     }
