@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 class WorkerHandler implements Runnable {
     private static final long POLL_TIMEOUT_MS = 100;
+    private static final long WATCHDOG_TICK_MS = 20;
 
     private final Socket socket;
     private final BlockingQueue<int[]> taskQueue;
@@ -42,7 +43,7 @@ class WorkerHandler implements Runnable {
              DataOutputStream out = new DataOutputStream(sock.getOutputStream());
              DataInputStream in = new DataInputStream(sock.getInputStream())) {
 
-            processLoop(out, in);
+            processLoop(sock, out, in);
 
         } catch (IOException e) {
             // Не удалось установить связь с воркером
@@ -53,7 +54,8 @@ class WorkerHandler implements Runnable {
         }
     }
 
-    private void processLoop(DataOutputStream out, DataInputStream in) throws InterruptedException {
+    private void processLoop(Socket sock, DataOutputStream out, DataInputStream in)
+            throws InterruptedException {
         while (!foundComposite.get() && !externalCancelled.get()) {
             int[] chunk = taskQueue.poll(POLL_TIMEOUT_MS, TimeUnit.MILLISECONDS);
             if (chunk == null) {
@@ -66,22 +68,76 @@ class WorkerHandler implements Runnable {
 
             try {
                 Protocol.writeTask(out, chunk);
-                byte tag = in.readByte();
-                if (tag == Protocol.MSG_RESULT) {
-                    boolean result = Protocol.readResult(in);
-                    remaining.decrementAndGet();
-                    if (result) {
-                        foundComposite.set(true);
-                    }
-                }
             } catch (IOException e) {
-                // Воркер упал или мастер закрыл сокет - чанк обратно в очередь
                 taskQueue.offer(chunk);
                 return;
+            }
+
+            AtomicBoolean awaitingResult = new AtomicBoolean(true);
+            AtomicBoolean cancelTriggered = new AtomicBoolean(false);
+            Thread watchdog = new Thread(
+                    () -> runWatchdog(sock, out, awaitingResult, cancelTriggered),
+                    "WorkerHandler-CancelWatchdog");
+            watchdog.setDaemon(true);
+            watchdog.start();
+
+            byte tag = 0;
+            boolean ioError = false;
+            try {
+                tag = in.readByte();
+            } catch (IOException e) {
+                ioError = true;
+            } finally {
+                awaitingResult.set(false);
+                watchdog.interrupt();
+                watchdog.join();
+            }
+
+            if (cancelTriggered.get()) {
+                return;
+            }
+
+            if (ioError) {
+                taskQueue.offer(chunk);
+                return;
+            }
+
+            if (tag == Protocol.MSG_RESULT) {
+                boolean result;
+                try {
+                    result = Protocol.readResult(in);
+                } catch (IOException e) {
+                    taskQueue.offer(chunk);
+                    return;
+                }
+                remaining.decrementAndGet();
+                if (result) {
+                    foundComposite.set(true);
+                }
             }
         }
 
         safeWriteCancel(out);
+    }
+
+    private void runWatchdog(Socket sock,
+                             DataOutputStream out,
+                             AtomicBoolean awaitingResult,
+                             AtomicBoolean cancelTriggered) {
+        while (awaitingResult.get()) {
+            if (foundComposite.get() || externalCancelled.get()) {
+                cancelTriggered.set(true);
+                safeWriteCancel(out);
+                try { sock.close(); } catch (IOException ignored) {}
+                return;
+            }
+            try {
+                Thread.sleep(WATCHDOG_TICK_MS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return;
+            }
+        }
     }
 
     private static void safeWriteCancel(DataOutputStream out) {
